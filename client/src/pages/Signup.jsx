@@ -11,14 +11,14 @@ const Signup = () => {
     password: '',
     confirmPassword: '',
     phone: '',
-    course: '',
+    class: '',
   });
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
-  const courses = [
+  const classes = [
     'Computer Science & Engineering',
     'Business Administration',
     'Mechanical Engineering',
@@ -67,7 +67,7 @@ const Signup = () => {
         password: '',
         confirmPassword: '',
         phone: '',
-        course: '',
+        class: '',
       });
 
       // Redirect to login after 2 seconds
@@ -173,23 +173,23 @@ const Signup = () => {
               />
             </div>
 
-            {/* Course Selection */}
+            {/* Class Selection */}
             <div>
-              <label htmlFor="course" className="block text-sm font-bold text-gray-700 mb-1">
-                Select Course
+              <label htmlFor="class" className="block text-sm font-bold text-gray-700 mb-1">
+                Select Class
               </label>
               <div className="relative">
                 <select
-                  id="course"
-                  name="course"
-                  value={formData.course}
+                  id="class"
+                  name="class"
+                  value={formData.class}
                   onChange={handleChange}
                   className="w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-800 focus:border-primary-800 transition-all outline-none bg-white appearance-none"
                 >
-                  <option value="">Choose a course...</option>
-                  {courses.map((course, index) => (
-                    <option key={index} value={course}>
-                      {course}
+                  <option value="">Choose a class...</option>
+                  {classes.map((classItem, index) => (
+                    <option key={index} value={classItem}>
+                      {classItem}
                     </option>
                   ))}
                 </select>

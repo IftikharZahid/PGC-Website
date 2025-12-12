@@ -6,7 +6,7 @@ const router = express.Router();
 // POST /api/auth/signup - Register new student
 router.post('/signup', async (req, res) => {
   try {
-    const { name, email, password, confirmPassword, phone, course } = req.body;
+    const { name, email, password, confirmPassword, phone, class: studentClass } = req.body;
 
     // Validation
     if (!name || !email || !password || !confirmPassword) {
@@ -51,7 +51,7 @@ router.post('/signup', async (req, res) => {
       email: email.toLowerCase(),
       password,
       phone,
-      course
+      class: studentClass
     });
 
     // Return user without password (handled by toJSON method)

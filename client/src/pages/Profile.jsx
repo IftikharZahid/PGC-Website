@@ -12,7 +12,7 @@ const Profile = () => {
   const [formData, setFormData] = useState({
     name: user?.name || '',
     phone: user?.phone || '',
-    course: user?.course || '',
+    class: user?.class || '',
   });
 
   const handleChange = (e) => {
@@ -249,15 +249,15 @@ const Profile = () => {
                 />
               </div>
 
-              {/* Course */}
+              {/* Class */}
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Course
+                  Class
                 </label>
                 <input
                   type="text"
-                  name="course"
-                  value={formData.course}
+                  name="class"
+                  value={formData.class}
                   onChange={handleChange}
                   disabled={!isEditing}
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all outline-none disabled:bg-gray-50 disabled:text-gray-600"
@@ -296,7 +296,7 @@ const Profile = () => {
                       setFormData({
                         name: user.name || '',
                         phone: user.phone || '',
-                        course: user.course || '',
+                        class: user.class || '',
                       });
                     }}
                     className="flex-1 btn-secondary"

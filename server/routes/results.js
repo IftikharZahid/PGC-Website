@@ -33,9 +33,9 @@ router.get('/:roll', async (req, res) => {
 router.post('/', async (req, res) => {
   try {
     // Basic validation
-    const { roll, name, course, semester, marks, class: studentClass, session } = req.body;
+    const { roll, name, class: studentClass, session, marks } = req.body;
     
-    if (!roll || !name || !course || !marks) {
+    if (!roll || !name || !studentClass || !marks) {
       return res.status(400).json({
         success: false,
         message: 'Please provide all required fields'
@@ -54,11 +54,9 @@ router.post('/', async (req, res) => {
     result = new Result({
       roll,
       name,
-      course,
-      semester,
-      marks,
       class: studentClass,
-      session
+      session,
+      marks
     });
 
     await result.save();

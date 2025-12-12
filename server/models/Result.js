@@ -12,21 +12,13 @@ const ResultSchema = new mongoose.Schema({
     required: true,
     trim: true
   },
-  course: {
-    type: String,
-    required: true
-  },
-  semester: {
-    type: String,
-    required: true
-  },
   class: {
     type: String,
-    required: false
+    required: true
   },
   session: {
     type: String,
-    required: false
+    required: true
   },
   marks: {
     type: Map,

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import logo from '../assets/punjab-college-logo.png';
 
 const Result = () => {
   const [roll, setRoll] = useState('');
@@ -78,8 +79,13 @@ const Result = () => {
             -webkit-print-color-adjust: exact;
           }
           
-          /* Hide everything except marks table */
+          /* Hide everything except result card */
           nav, footer, .print\\:hidden, .no-print {
+            display: none !important;
+          }
+          
+          /* Hide search card in print view */
+          .min-h-screen > .max-w-5xl > div:first-child {
             display: none !important;
           }
           
@@ -87,19 +93,22 @@ const Result = () => {
           .min-h-screen {
             min-height: auto !important;
             padding: 0 !important;
+            margin: 0 !important;
             background: white !important;
           }
           
-          /* Show only marks table */
-          .print-only {
-            display: block !important;
+          .max-w-5xl {
+            max-width: 100% !important;
+            padding: 0 !important;
+            margin: 0 !important;
           }
           
-          /* Ensure colors print correctly */
+          /* Ensure result card prints properly */
           .card {
             background: white !important;
             box-shadow: none !important;
             border: 1px solid #e5e7eb !important;
+            page-break-inside: avoid;
           }
           
           /* Table print styles */
@@ -111,14 +120,6 @@ const Result = () => {
 
       <div className="min-h-screen pt-24 pb-16 px-4 bg-gray-50 dark:bg-gray-900 print:pt-0 print:pb-0 print:px-0">
         <div className="max-w-5xl mx-auto print:max-w-none">
-        {/* Header */}
-        <div className="text-center mb-12 animate-fade-in">
-          <h1 className="text-5xl font-bold mb-4 gradient-text">Student Result Lookup</h1>
-          <p className="text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
-            Enter your roll number to view your exam results and academic performance.
-          </p>
-        </div>
-
         {/* Search Card */}
         <div className="max-w-4xl mx-auto mb-12 animate-slide-in">
           <div className="card">
@@ -169,10 +170,18 @@ const Result = () => {
         {result && (
           <div className="animate-fade-in">
             {/* Result Card - Same layout for screen and print */}
-            <div className="card overflow-hidden p-6 max-w-4xl mx-auto">
+            <div className="card overflow-hidden p-6 max-w-4xl mx-auto relative">
+              {/* Watermark Logo */}
+              <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-5">
+                <img src={logo} alt="Watermark" className="w-64 h-64 object-contain" />
+              </div>
+              
               {/* Header */}
               <div className="mb-4 pb-3 border-b-2 border-gray-300 dark:border-gray-600">
-                <h2 className="text-xl font-bold text-center mb-3 text-gray-900 dark:text-gray-100">PUNJAB COLLEGE FORT ABBAS</h2>
+                <div className="flex items-center justify-center gap-4 mb-3">
+                  <img src={logo} alt="College Logo" className="w-16 h-16 object-contain" />
+                  <h2 className="text-3xl font-bold text-center text-gray-900 dark:text-gray-100">PUNJAB COLLEGE FORT ABBAS</h2>
+                </div>
                 <div className="grid grid-cols-2 gap-x-6 gap-y-1 text-xs">
                   <div className="flex">
                     <span className="font-semibold w-24">Student Name:</span>
@@ -183,21 +192,9 @@ const Result = () => {
                     <span className="flex-1 border-b border-gray-400">{result.roll}</span>
                   </div>
                   <div className="flex">
-                    <span className="font-semibold w-24">Course:</span>
-                    <span className="flex-1 border-b border-gray-400">{result.course}</span>
+                    <span className="font-semibold w-24">Class:</span>
+                    <span className="flex-1 border-b border-gray-400">{result.class}</span>
                   </div>
-                  {result.class && (
-                    <div className="flex">
-                      <span className="font-semibold w-24">Class:</span>
-                      <span className="flex-1 border-b border-gray-400">{result.class}</span>
-                    </div>
-                  )}
-                  {result.semester && (
-                    <div className="flex">
-                      <span className="font-semibold w-24">Semester:</span>
-                      <span className="flex-1 border-b border-gray-400">{result.semester}</span>
-                    </div>
-                  )}
                   {result.session && (
                     <div className="flex">
                       <span className="font-semibold w-24">Session:</span>
@@ -210,7 +207,7 @@ const Result = () => {
               <div className="overflow-x-auto">
                 <table className="w-full">
                   <thead>
-                    <tr className="border-b-2 border-gray-200 dark:border-gray-700">
+                    <tr className="border-b-2 border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-800">
                       <th className="text-left py-2 px-3 font-bold text-gray-700 dark:text-gray-300 text-sm">Subject</th>
                       <th className="text-center py-2 px-3 font-bold text-gray-700 dark:text-gray-300 text-sm">Total Marks</th>
                       <th className="text-center py-2 px-3 font-bold text-gray-700 dark:text-gray-300 text-sm">Obtained</th>
@@ -230,11 +227,7 @@ const Result = () => {
                           <td className="py-2 px-3 text-center font-bold text-gray-800 dark:text-gray-100 text-sm">{mark}</td>
                           <td className="py-2 px-3 text-center text-gray-600 dark:text-gray-400 text-sm">{percentage}%</td>
                           <td className="py-2 px-3 text-center">
-                            <span className={`inline-block px-2 py-0.5 rounded text-xs font-bold ${
-                              grade === 'A+' || grade === 'A' ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400' :
-                              grade === 'B' || grade === 'C' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400' :
-                              'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400'
-                            }`}>
+                            <span className="text-sm font-bold text-gray-800 dark:text-gray-100">
                               {grade}
                             </span>
                           </td>

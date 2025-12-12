@@ -16,7 +16,7 @@ export const createUser = (userData) => {
     password: userData.password, // In production, this should be hashed
     name: userData.name,
     phone: userData.phone,
-    course: userData.course,
+    class: userData.class,
     createdAt: new Date().toISOString(),
   };
   
@@ -52,7 +52,7 @@ export const updateUserProfile = (email, updates) => {
   // Update user properties
   if (updates.name !== undefined) user.name = updates.name;
   if (updates.phone !== undefined) user.phone = updates.phone;
-  if (updates.course !== undefined) user.course = updates.course;
+  if (updates.class !== undefined) user.class = updates.class;
   if (updates.profilePicture !== undefined) user.profilePicture = updates.profilePicture;
 
   return user;

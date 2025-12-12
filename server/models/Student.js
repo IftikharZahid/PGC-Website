@@ -30,7 +30,7 @@ const studentSchema = new mongoose.Schema({
     type: String,
     trim: true
   },
-  course: {
+  class: {
     type: String,
     trim: true
   },

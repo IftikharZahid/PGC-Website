@@ -124,10 +124,6 @@ cd server
 npm start        # Production mode
 ```
 
-## 🤝 Contributing
-
-Feel free to fork this project and submit pull requests for improvements!
-
 ## 📄 License
 
 ISC

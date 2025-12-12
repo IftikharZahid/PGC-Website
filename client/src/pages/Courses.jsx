@@ -116,15 +116,20 @@ const Courses = () => {
   }
 
   return (
-    <div className="min-h-screen pt-24 pb-16 px-4 bg-gray-50 dark:bg-gray-900">
-      <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="text-center mb-12 animate-fade-in">
-          <h1 className="text-5xl font-bold mb-4 gradient-text">Our Courses</h1>
-          <p className="text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
+    <div className="min-h-screen">
+      {/* Hero Section */}
+      <section className="relative pt-32 pb-20 px-4 bg-gradient-to-br from-primary-600 to-secondary-700 text-white overflow-hidden">
+        <div className="absolute inset-0 bg-black/20"></div>
+        <div className="relative max-w-7xl mx-auto text-center animate-fade-in">
+          <h1 className="text-4xl md:text-6xl font-bold mb-4">Our Courses</h1>
+          <p className="text-xl md:text-2xl text-white/90 max-w-2xl mx-auto">
             Discover our wide range of programs designed to help you achieve your academic and career goals.
           </p>
         </div>
+      </section>
+
+      <div className="px-4 py-16 bg-gray-50 dark:bg-gray-900">
+      <div className="max-w-7xl mx-auto">
 
         {/* Course Count */}
         <div className="mb-8">
@@ -197,6 +202,7 @@ const Courses = () => {
           </div>
         )}
       </div>
+    </div>
     </div>
   );
 };

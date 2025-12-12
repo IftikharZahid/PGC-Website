@@ -8,28 +8,47 @@ const results = [
   {
     roll: "1001",
     name: "Zikki",
-    course: "B.Sc Computer Science",
-    semester: "6th",
+    class: "B.Sc Computer Science",
+    session: "6th",
     marks: {
-      "Cloud Computing": 88,
-      "Artificial Intelligence": 92,
-      "Web Technologies": 85,
-      "Data Warehousing": 79,
-      "Project": 95
+      "Mathematics": 95,
+      "Computer Science": 80,
+      "Biology": 90,
+      "Chemistry": 80,
+      "Physics": 70,
+      "Psychology": 85,
+      "Economics": 65,
+      "English": 85,
+      "Statistics": 75,
+      "Project": 95,
+      "Tarjuma tul Quran": 85,
+      "Pak Study": 85,
+      "Islamiat": 85,
+      "Urdu": 85,
+ 
     }
   },
   {
     roll: "zikki",
     name: "Zikki",
-    course: "B.Sc Computer Science",
-    semester: "6th",
+    class: "B.Sc Computer Science",
+    session: "6th",
     marks: {
-      "Cloud Computing": 88,
-      "Artificial Intelligence": 92,
-      "Web Technologies": 85,
-      "Data Warehousing": 79,
-      "Project": 95
-    }
+      "Mathematics": 95,
+      "Computer Science": 80,
+      "Biology": 90,
+      "Chemistry": 80,
+      "Physics": 70,
+      "Psychology": 85,
+      "Economics": 65,
+      "English": 85,
+      "Statistics": 75,
+      "Project": 95,
+      "Tarjuma tul Quran": 85,
+      "Pak Study": 85,
+      "Islamiat": 85,
+      "Urdu": 85,
+ }
   }
 ];
 
