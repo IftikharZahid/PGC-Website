@@ -13,11 +13,11 @@ const Footer = () => {
   ];
 
   const resources = [
-    { name: 'Library', path: '#' },
+    { name: 'Library', path: '/library' },
     { name: 'Student Portal', path: '/login' },
-    { name: 'Career Services', path: '#' },
-    { name: 'Research', path: '#' },
-    { name: 'Events', path: '#' },
+    { name: 'Career Services', path: '/career-services' },
+    { name: 'Research', path: '/research' },
+    { name: 'Events', path: '/events' },
     { name: 'News', path: '#' },
   ];
 

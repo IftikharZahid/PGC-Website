@@ -2,23 +2,25 @@ import React, { useState } from 'react';
 import RevealOnScroll from '../components/RevealOnScroll';
 import principalPortrait from '../assets/principal-portrait.png';
 import managingDirector from '../assets/managing-director.png';
+import ComputerScience from '../assets/ComputerScience.jpeg';
+// import chemistry from '../assets/chemistry.png';
 
 const Faculty = () => {
   const [activeTab, setActiveTab] = useState('All');
 
-  const departments = ['All', 'Computer Science', 'Science', 'Commerce', 'Humanities'];
+  const departments = ['All', 'Computer Science', 'Science', 'Commerce', 'Humanities',];
 
   const facultyMembers = [
     {
-      name: "Prof. Dr. Ahmad Raza",
-      designation: "Principal",
+      name: "Muhammad Ahmad Raza Watto",
+      designation: "Principal/Director",
       department: "Administration",
       image: principalPortrait,
       qualification: "Ph.D. Education",
       experience: "25+ Years"
     },
     {
-      name: "Salman Maqsood",
+      name: "Arshad Bhutta",
       designation: "Managing Director",
       department: "Administration",
       image: managingDirector,
@@ -26,14 +28,15 @@ const Faculty = () => {
       experience: "20+ Years"
     },
     {
-      name: "Dr. Sarah Khan",
-      designation: "HOD Computer Science",
+      name: "Iftikhar Ahmad Zahid",
+      designation: "Professor",
       department: "Computer Science",
-      qualification: "Ph.D. CS",
-      experience: "15 Years"
+      qualification: "MSC(CS)",
+      image: ComputerScience,
+      experience: "6 Years"
     },
     {
-      name: "Mr. Ali Hassan",
+      name: "Muhammad Asif",
       designation: "Senior Lecturer",
       department: "Computer Science",
       qualification: "MS CS",

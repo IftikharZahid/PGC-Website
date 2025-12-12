@@ -40,6 +40,7 @@ export const ThemeProvider = ({ children }) => {
   };
 
   const value = {
+    isDarkMode: isDark,
     isDark,
     toggleTheme,
   };

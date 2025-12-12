@@ -17,6 +17,13 @@ import PrivacyPolicy from './pages/PrivacyPolicy';
 import TermsOfService from './pages/TermsOfService';
 import Accessibility from './pages/Accessibility';
 import News from './pages/News';
+import Events from './pages/Events';
+import CareerServices from './pages/CareerServices';
+import Library from './pages/Library';
+import LibraryCatalog from './pages/LibraryCatalog';
+import Research from './pages/Research';
+import ResearchOpportunities from './pages/ResearchOpportunities';
+import ContactResearch from './pages/ContactResearch';
 
 import ScrollToTop from './components/ScrollToTop';
 
@@ -41,6 +48,13 @@ function App() {
                 <Route path="/signup" element={<Signup />} />
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/news" element={<News />} />
+                <Route path="/events" element={<Events />} />
+                <Route path="/career-services" element={<CareerServices />} />
+                <Route path="/library" element={<Library />} />
+                <Route path="/library/catalog" element={<LibraryCatalog />} />
+                <Route path="/research" element={<Research />} />
+                <Route path="/research/opportunities" element={<ResearchOpportunities />} />
+                <Route path="/research/contact" element={<ContactResearch />} />
                 <Route path="/privacy-policy" element={<PrivacyPolicy />} />
                 <Route path="/terms-of-service" element={<TermsOfService />} />
                 <Route path="/accessibility" element={<Accessibility />} />

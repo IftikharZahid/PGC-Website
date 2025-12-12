@@ -17,7 +17,7 @@ const Home = () => {
            <img 
              src={collegeBuilding} 
              alt="University Campus" 
-             className="w-full h-full object-cover"
+             className="w-full h-full object-cover rounded-lg"
            />
            <div className="absolute inset-0 bg-primary-900/40 mix-blend-multiply"></div> 
            {/* Gradient Overlay for Text Readability */}
@@ -80,7 +80,7 @@ const Home = () => {
                <RevealOnScroll animation="animate-fade-left">
                   <div className="relative">
                     <div className="absolute top-0 right-0 w-3/4 h-full bg-gray-200 -z-10 transform translate-x-8 -translate-y-8"></div>
-                    <img src={graduatingStudents} alt="Students" className="w-full shadow-2xl" />
+                    <img src={graduatingStudents} alt="Students" className="w-full shadow-2xl rounded-lg" />
                   </div>
                </RevealOnScroll>
             </div>
@@ -103,8 +103,8 @@ const Home = () => {
               ].map((item, idx) => (
                 <RevealOnScroll key={idx} animation="animate-fade-up" delay={`${idx * 0.2}s`}>
                    <div className="group cursor-pointer">
-                      <div className="overflow-hidden mb-4">
-                         <img src={item.img} alt={item.title} className="w-full h-64 object-cover transform group-hover:scale-105 transition-transform duration-500"/>
+                      <div className="overflow-hidden mb-4 rounded-lg">
+                         <img src={item.img} alt={item.title} className="w-full h-48 object-cover transform group-hover:scale-105 transition-transform duration-500 rounded-lg"/>
                       </div>
                       <div className="text-primary-700 text-xs font-bold uppercase tracking-widest mb-2">{item.cat}</div>
                       <h3 className="text-2xl font-serif font-bold mb-3 group-hover:text-primary-700 transition-colors leading-tight">{item.title}</h3>

@@ -3,7 +3,7 @@ import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useTheme } from "../context/ThemeContext";
 import logo from "../assets/punjab-college-logo.png";
-import placeholder from "../assets/placeholder-profile.jpg";
+import placeholder from "../assets/student-portrait.png";
 
 
 const Navbar = () => {

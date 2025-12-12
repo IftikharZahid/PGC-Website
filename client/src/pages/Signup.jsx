@@ -19,12 +19,11 @@ const Signup = () => {
   const [success, setSuccess] = useState('');
 
   const classes = [
-    'Computer Science & Engineering',
-    'Business Administration',
-    'Mechanical Engineering',
-    'English Literature',
-    'Data Science & Analytics',
-    'Psychology',
+    'FSc/Bio',
+    'BSc',
+    'MSc',
+    'PhD',
+    'MPhil',
   ];
 
   const handleChange = (e) => {
