@@ -3,6 +3,7 @@ import react from '@vitejs/plugin-react'
 
 // https://vite.dev/config/
 export default defineConfig({
+  base: '/PGC-Website/', // Replace 'PGC-Website' with your GitHub repository name
   plugins: [react()],
   server: {
     proxy: {
