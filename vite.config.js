@@ -3,7 +3,7 @@ import react from '@vitejs/plugin-react'
 
 // https://vite.dev/config/
 export default defineConfig({
-  base: '/PGC-Website/', // Replace 'PGC-Website' with your GitHub repository name
+  base: '/', // Use '/' for Vercel, '/PGC-Website/' for GitHub Pages
   plugins: [react()],
   server: {
     proxy: {
