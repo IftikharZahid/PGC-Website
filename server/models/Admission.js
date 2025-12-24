@@ -49,6 +49,24 @@ const admissionSchema = new mongoose.Schema({
     desiredCourse: { type: String, required: true },
     preferredTerm: { type: String, required: true }
   },
+  enrolledSubjects: {
+    type: [String],
+    default: []
+  },
+  documents: {
+    profilePicture: { 
+      type: String, 
+      default: '' 
+    },
+    matricResultCard: { 
+      type: String, 
+      required: true 
+    },
+    cnicPicture: { 
+      type: String, 
+      required: true 
+    }
+  },
   status: {
     type: String,
     enum: ['pending', 'under_review', 'accepted', 'rejected'],

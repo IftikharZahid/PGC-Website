@@ -38,17 +38,17 @@ const ContactResearch = () => {
 
   const staff = [
     {
-      name: "Dr. Hassan Ahmed",
-      position: "Director of Research",
-      email: "research.director@pgc.edu.pk",
+      name: "Principle Muhammad Ahmad Raza",
+      position: "Principle",
+      email: "Prof.FTAPCIT0033@pgc.edu.pk",
       phone: "+92 (307) 2280-505",
       image: "👨‍🔬"
     },
     {
-      name: "Dr. Fatima Khan",
-      position: "Research Coordinator",
-      email: "research.coordinator@pgc.edu.pk",
-      phone: "+92 (307) 2280-506",
+      name: "Dr. Iftikhar Zahid",
+      position: "Director of Research",
+      email: "Prof.FTAPCIT0033@pgc.edu.pk",
+      phone: "+92 (300) 7971-374",
       image: "👩‍🔬"
     }
   ];
@@ -56,26 +56,28 @@ const ContactResearch = () => {
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="relative pt-32 pb-16 px-4 bg-gradient-to-br from-primary-600 to-secondary-700 text-white overflow-hidden">
-        <div className="absolute inset-0 bg-black/20"></div>
-        <div className="relative max-w-7xl mx-auto">
-          <div className="flex items-center mb-6">
-            <Link to="/research" className="text-white/80 hover:text-white transition-colors flex items-center">
-              <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-              </svg>
-              Back to Research
-            </Link>
+      <section className="relative px-4 bg-secondary-700 text-white overflow-hidden h-[200px] md:h-[220px]">
+        <div className="absolute inset-0 bg-black/25"></div>
+        <div className="relative max-w-7xl mx-auto h-full flex items-center justify-center">
+          <div className="text-center animate-fade-in w-full py-4">
+            <div className="mb-4">
+              <Link to="/research" className="text-white/80 hover:text-white transition-colors inline-flex items-center text-sm">
+                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                </svg>
+                Back to Research
+              </Link>
+            </div>
+            <h1 className="text-2xl md:text-4xl font-bold mt-20">Contact Research Office</h1>
+            <p className="text-sm md:text-base text-white/90 max-w-2xl mx-auto">
+              Get in touch with our research team for inquiries, collaborations, or support
+            </p>
           </div>
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">Contact Research Office</h1>
-          <p className="text-xl text-white/90 max-w-2xl">
-            Get in touch with our research team for inquiries, collaborations, or support
-          </p>
         </div>
       </section>
 
       {/* Contact Form & Info */}
-      <section className="py-16 px-4 bg-gray-50 dark:bg-gray-900">
+      <section className="py-8 px-4 bg-gray-50 dark:bg-gray-900">
         <div className="max-w-7xl mx-auto">
           <div className="grid lg:grid-cols-2 gap-12">
             {/* Contact Form */}
@@ -200,7 +202,7 @@ const ContactResearch = () => {
                       </svg>
                       <div>
                         <p className="font-semibold text-gray-900 dark:text-white">Address</p>
-                        <p className="text-gray-600 dark:text-gray-400">Research Office, 2nd Floor<br/>Main Building, Punjab College<br/>Fort Abbas, Punjab</p>
+                        <p className="text-gray-600 dark:text-gray-400">Research Office, 2nd Floor<br />Main Building, Punjab College<br />Fort Abbas, Punjab</p>
                       </div>
                     </div>
 
@@ -230,7 +232,7 @@ const ContactResearch = () => {
                       </svg>
                       <div>
                         <p className="font-semibold text-gray-900 dark:text-white">Office Hours</p>
-                        <p className="text-gray-600 dark:text-gray-400">Monday - Friday<br/>9:00 AM - 5:00 PM</p>
+                        <p className="text-gray-600 dark:text-gray-400">Monday - Friday<br />9:00 AM - 5:00 PM</p>
                       </div>
                     </div>
                   </div>
@@ -249,7 +251,7 @@ const ContactResearch = () => {
                           <h4 className="font-bold text-gray-900 dark:text-white">{member.name}</h4>
                           <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">{member.position}</p>
                           <p className="text-sm text-gray-600 dark:text-gray-400">
-                            📧 {member.email}<br/>
+                            📧 {member.email}<br />
                             📞 {member.phone}
                           </p>
                         </div>

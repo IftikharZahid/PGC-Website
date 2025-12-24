@@ -95,18 +95,20 @@ const Research = () => {
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="relative pt-32 pb-20 px-4 bg-gradient-to-br from-primary-600 to-secondary-700 text-white overflow-hidden">
-        <div className="absolute inset-0 bg-black/20"></div>
-        <div className="relative max-w-7xl mx-auto text-center animate-fade-in">
-          <h1 className="text-4xl md:text-6xl font-bold mb-4">Research & Innovation</h1>
-          <p className="text-xl md:text-2xl text-white/90 max-w-3xl mx-auto">
-            Advancing knowledge through cutting-edge research and innovation
-          </p>
+      <section className="relative px-4 bg-secondary-700 text-white overflow-hidden h-[180px] md:h-[200px]">
+        <div className="absolute inset-0 bg-black/25"></div>
+        <div className="relative max-w-7xl mx-auto h-full flex items-center justify-center">
+          <div className="text-center animate-fade-in w-full py-4">
+            <h1 className="text-2xl md:text-4xl font-bold mt-20">Research & Innovation</h1>
+            <p className="text-sm md:text-base text-white/90 max-w-3xl mx-auto">
+              Advancing knowledge through cutting-edge research and innovation
+            </p>
+          </div>
         </div>
       </section>
 
       {/* Research Areas */}
-      <section className="py-20 px-4 bg-white dark:bg-gray-800">
+      <section className="py-10 px-4 bg-white dark:bg-gray-800">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold mb-4 text-gray-900 dark:text-white">Research Areas</h2>
@@ -142,7 +144,7 @@ const Research = () => {
       </section>
 
       {/* Ongoing Projects */}
-      <section className="py-20 px-4 bg-gray-50 dark:bg-gray-900">
+      <section className="py-10 px-4 bg-gray-50 dark:bg-gray-900">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold mb-4 text-gray-900 dark:text-white">Featured Projects</h2>
@@ -160,11 +162,10 @@ const Research = () => {
                       <span className="text-xs font-bold uppercase tracking-wider bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-400 px-3 py-1 rounded-full">
                         {project.department}
                       </span>
-                      <span className={`text-xs font-bold px-3 py-1 rounded-full ${
-                        project.status === 'In Progress' 
+                      <span className={`text-xs font-bold px-3 py-1 rounded-full ${project.status === 'In Progress'
                           ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400'
                           : 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400'
-                      }`}>
+                        }`}>
                         {project.status}
                       </span>
                     </div>
@@ -172,7 +173,7 @@ const Research = () => {
                     <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">
                       {project.title}
                     </h3>
-                    
+
                     <p className="text-gray-600 dark:text-gray-300 mb-4">
                       {project.description}
                     </p>
@@ -206,7 +207,7 @@ const Research = () => {
       </section>
 
       {/* Research Facilities */}
-      <section className="py-20 px-4 bg-white dark:bg-gray-800">
+      <section className="py-10 px-4 bg-white dark:bg-gray-800">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold mb-4 text-gray-900 dark:text-white">Research Facilities</h2>
@@ -230,7 +231,7 @@ const Research = () => {
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 px-4 bg-gradient-to-br from-primary-600 to-secondary-700 text-white">
+      <section className="py-10 px-4 bg-secondary-700 text-white">
         <div className="max-w-4xl mx-auto text-center">
           <RevealOnScroll animation="animate-fade-up">
             <h2 className="text-3xl md:text-4xl font-bold mb-6">Get Involved in Research</h2>

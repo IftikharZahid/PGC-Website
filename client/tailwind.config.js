@@ -9,28 +9,28 @@ export default {
     extend: {
       colors: {
         primary: {
-          50: '#fcf4f4',
-          100: '#fcedef',
-          200: '#f5d5da',
-          300: '#f0b0b8',
-          400: '#e67a88',
-          500: '#d64558',
-          600: '#c02538', // UChicago Maroon-ish
-          700: '#800000', // Deep Maroon
-          800: '#600000',
-          900: '#400000',
+          50: '#fff1f0',   // Lightest red
+          100: '#ffe1de',  // Very light red
+          200: '#ffc8c1',  // Light red
+          300: '#ffa59a',  // Medium light red
+          400: '#ff7363',  // Medium red
+          500: '#f84d3c',  // Core red
+          600: '#e13a27',  // PGC Red (Target)
+          700: '#c02e1f',  // Deep red
+          800: '#a0271b',  // Forest red
+          900: '#842318',  // Darkest red
         },
         secondary: {
-          50: '#f8f9fa',
-          100: '#f1f3f5',
-          200: '#e9ecef',
-          300: '#dee2e6',
-          400: '#ced4da',
-          500: '#adb5bd',
-          600: '#868e96',
-          700: '#495057',
-          800: '#343a40',
-          900: '#212529',
+          50: '#efefff',   // Lightest blue
+          100: '#e1e0ff',  // Very light blue
+          200: '#c7c6ff',  // Light blue
+          300: '#a3a0fb',  // Medium light blue
+          400: '#7a76f8',  // Medium blue
+          500: '#534bf4',  // Core blue
+          600: '#3c32e6',  // Strong blue
+          700: '#2C2B6F',  // PGC Blue (Target)
+          800: '#24235c',  // Deep blue
+          900: '#1d1c4a',  // Darkest blue
         },
       },
       fontFamily: {

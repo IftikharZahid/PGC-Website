@@ -14,7 +14,9 @@ router.post('/', async (req, res) => {
       gender,
       address,
       academic,
-      program
+      program,
+      documents,
+      enrolledSubjects
     } = req.body;
 
     // Validation - required fields
@@ -43,6 +45,14 @@ router.post('/', async (req, res) => {
       return res.status(400).json({
         success: false,
         message: 'Please provide program selection'
+      });
+    }
+
+    // Document validation - required documents
+    if (!documents || !documents.matricResultCard || !documents.cnicPicture) {
+      return res.status(400).json({
+        success: false,
+        message: 'Please upload required documents (Matric Result Card and CNIC Picture)'
       });
     }
 
@@ -83,13 +93,67 @@ router.post('/', async (req, res) => {
       gender,
       address,
       academic,
-      program
+      program,
+      enrolledSubjects: enrolledSubjects || [],
+      documents: {
+        profilePicture: documents.profilePicture || '',
+        matricResultCard: documents.matricResultCard,
+        cnicPicture: documents.cnicPicture
+      }
     });
+
+    // Auto-create student account with login credentials
+    try {
+      const Student = (await import('../models/Student.js')).default;
+      const { generatePassword } = await import('../utils/passwordGenerator.js');
+      const { sendLoginCredentialsEmail } = await import('../utils/emailService.js');
+
+      // Check if student account already exists
+      const existingStudent = await Student.findOne({ email: email.toLowerCase() });
+      
+      if (!existingStudent) {
+        // Generate credentials
+        const generatedPassword = generatePassword(8);
+        const year = new Date().getFullYear();
+        const randomNum = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
+        const studentId = `STU${year}${randomNum}`;
+
+        // Create student account
+        const newStudent = await Student.create({
+          studentId,
+          name: fullName,
+          email: email.toLowerCase(),
+          password: generatedPassword,
+          phone,
+          class: program.desiredCourse,
+          profilePicture: documents.profilePicture || ''
+        });
+
+        // Send login credentials via email
+        await sendLoginCredentialsEmail(
+          email.toLowerCase(),
+          fullName,
+          studentId,
+          generatedPassword
+        );
+
+        console.log(`\n✅ Student account created successfully!`);
+        console.log(`Student ID: ${studentId}`);
+        console.log(`Email: ${email.toLowerCase()}`);
+        console.log(`Login credentials sent to email\n`);
+      } else {
+        console.log(`\nℹ️ Student account already exists for ${email}`);
+      }
+    } catch (studentCreationError) {
+      // Log error but don't fail the admission submission
+      console.error('Error creating student account:', studentCreationError);
+      console.log('Admission was successful, but student account creation failed.');
+    }
 
     // Return success response
     res.status(201).json({
       success: true,
-      message: 'Application submitted successfully! We will contact you soon.',
+      message: 'Application submitted successfully! Check your email for login credentials.',
       data: {
         applicationId: newApplication.applicationId,
         submittedAt: newApplication.submittedAt,

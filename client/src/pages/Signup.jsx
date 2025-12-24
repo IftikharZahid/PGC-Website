@@ -58,7 +58,7 @@ const Signup = () => {
       }
 
       setSuccess(`Account created successfully! Student ID: ${data.data.studentId}`);
-      
+
       // Clear form
       setFormData({
         name: '',
@@ -90,14 +90,14 @@ const Signup = () => {
         </svg>
       </div>
 
-      <div className="w-full max-w-2xl animate-fade-in relative z-10">
+      <div className="w-full max-w-md animate-fade-in relative z-10">
         {/* Signup Card */}
-        <div className="bg-white rounded-xl shadow-2xl p-8 md:p-10 border border-gray-200">
+        <div className="bg-white rounded-xl shadow-2xl p-6 md:p-8 border border-gray-200">
           {/* Header */}
-          <div className="text-center mb-8">
-            <img src={logo} alt="College Logo" className="w-20 h-20 mx-auto mb-4 object-contain" />
-            <h1 className="text-3xl font-serif font-bold text-gray-900 mb-2">Create Account</h1>
-            <p className="text-gray-600">Join our community of learners</p>
+          <div className="text-center mb-6">
+            <img src={logo} alt="College Logo" className="w-16 h-16 mx-auto mb-3 object-contain rounded-lg" />
+            <h1 className="text-2xl font-serif font-bold text-gray-900 mb-1">Create Account</h1>
+            <p className="text-sm text-gray-600">Join our community of learners</p>
           </div>
 
           {/* Success Message */}
@@ -193,9 +193,9 @@ const Signup = () => {
                   ))}
                 </select>
                 <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
-                   <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                   </svg>
+                  <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
                 </div>
               </div>
             </div>
@@ -258,8 +258,8 @@ const Signup = () => {
             </div>
 
             {/* Submit Button */}
-            <button 
-              type="submit" 
+            <button
+              type="submit"
               disabled={loading}
               className="w-full bg-primary-800 text-white rounded-md py-3 font-bold uppercase tracking-wide hover:bg-primary-900 transition-colors shadow-md disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             >
@@ -298,13 +298,13 @@ const Signup = () => {
         {/* Help Text */}
         <p className="text-center text-white/80 text-sm mt-8 border-t border-white/20 pt-4">
           By signing up, you agree to our{' '}
-          <a href="#" className="font-bold underline hover:text-white">
+          <Link to="/terms-of-service" className="font-bold underline hover:text-white">
             Terms of Service
-          </a>{' '}
+          </Link>{' '}
           and{' '}
-          <a href="#" className="font-bold underline hover:text-white">
+          <Link to="/privacy-policy" className="font-bold underline hover:text-white">
             Privacy Policy
-          </a>
+          </Link>
         </p>
       </div>
     </div>

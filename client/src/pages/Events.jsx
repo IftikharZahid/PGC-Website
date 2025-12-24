@@ -108,8 +108,8 @@ const Events = () => {
     }
   ];
 
-  const filteredEvents = activeTab === 'All' 
-    ? eventsData 
+  const filteredEvents = activeTab === 'All'
+    ? eventsData
     : eventsData.filter(event => event.category === activeTab);
 
   const formatDate = (dateString) => {
@@ -120,13 +120,15 @@ const Events = () => {
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="relative pt-32 pb-20 px-4 bg-gradient-to-br from-primary-600 to-secondary-700 text-white overflow-hidden">
-        <div className="absolute inset-0 bg-black/20"></div>
-        <div className="relative max-w-7xl mx-auto text-center animate-fade-in">
-          <h1 className="text-4xl md:text-6xl font-bold mb-4">Campus Events</h1>
-          <p className="text-xl md:text-2xl text-white/90 max-w-2xl mx-auto">
-            Stay connected with exciting activities, competitions, and learning opportunities
-          </p>
+      <section className="relative px-4 bg-secondary-700 text-white overflow-hidden h-[180px] md:h-[200px]">
+        <div className="absolute inset-0 bg-black/25"></div>
+        <div className="relative max-w-7xl mx-auto h-full flex items-center justify-center">
+          <div className="text-center animate-fade-in w-full py-4">
+            <h1 className="text-2xl md:text-4xl font-bold mt-20">Campus Events</h1>
+            <p className="text-sm md:text-base text-white/90 max-w-2xl mx-auto">
+              Stay connected with exciting activities, competitions, and learning opportunities
+            </p>
+          </div>
         </div>
       </section>
 
@@ -138,11 +140,10 @@ const Events = () => {
               <button
                 key={category}
                 onClick={() => setActiveTab(category)}
-                className={`px-6 py-2 rounded-full text-sm font-semibold transition-all duration-300 ${
-                  activeTab === category
+                className={`px-6 py-2 rounded-full text-sm font-semibold transition-all duration-300 ${activeTab === category
                     ? 'bg-primary-600 text-white shadow-lg scale-105'
                     : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
-                }`}
+                  }`}
               >
                 {category}
               </button>
@@ -161,14 +162,14 @@ const Events = () => {
       </section>
 
       {/* Events Grid */}
-      <section className="py-16 px-4 bg-gray-50 dark:bg-gray-900">
+      <section className="py-8 px-4 bg-gray-50 dark:bg-gray-900">
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {filteredEvents.map((event, index) => (
               <RevealOnScroll key={event.id} animation="animate-fade-up" delay={`${index * 0.1}s`}>
                 <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden group hover:-translate-y-2 transition-all duration-300 flex flex-col h-full">
                   {/* Event Icon/Image */}
-                  <div className="relative h-48 bg-gradient-to-br from-primary-400 to-secondary-400 flex items-center justify-center text-7xl overflow-hidden">
+                  <div className="relative h-48 bg-secondary-700 flex items-center justify-center text-7xl overflow-hidden">
                     <div className="transform transition-transform duration-500 group-hover:scale-125">
                       {event.image}
                     </div>
@@ -178,17 +179,17 @@ const Events = () => {
                       </span>
                     </div>
                   </div>
-                  
+
                   {/* Event Content */}
                   <div className="p-6 flex-grow flex flex-col">
                     <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
                       {event.title}
                     </h3>
-                    
+
                     <p className="text-gray-600 dark:text-gray-300 mb-4 flex-grow line-clamp-3">
                       {event.description}
                     </p>
-                    
+
                     {/* Event Details */}
                     <div className="border-t border-gray-100 dark:border-gray-700 pt-4 space-y-2">
                       <div className="flex items-center text-sm text-gray-500 dark:text-gray-400">
@@ -226,7 +227,7 @@ const Events = () => {
 
       {/* Empty State */}
       {filteredEvents.length === 0 && (
-        <section className="py-16 px-4 bg-gray-50 dark:bg-gray-900">
+        <section className="py-8 px-4 bg-gray-50 dark:bg-gray-900">
           <div className="max-w-7xl mx-auto text-center">
             <svg className="w-24 h-24 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />

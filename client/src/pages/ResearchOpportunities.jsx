@@ -64,28 +64,30 @@ const ResearchOpportunities = () => {
     }
   ];
 
-  const filteredOpportunities = selectedType === 'All' 
-    ? opportunities 
+  const filteredOpportunities = selectedType === 'All'
+    ? opportunities
     : opportunities.filter(opp => opp.type === selectedType);
 
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="relative pt-32 pb-16 px-4 bg-gradient-to-br from-primary-600 to-secondary-700 text-white overflow-hidden">
-        <div className="absolute inset-0 bg-black/20"></div>
-        <div className="relative max-w-7xl mx-auto">
-          <div className="flex items-center mb-6">
-            <Link to="/research" className="text-white/80 hover:text-white transition-colors flex items-center">
-              <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-              </svg>
-              Back to Research
-            </Link>
+      <section className="relative px-4 bg-secondary-700 text-white overflow-hidden h-[200px] md:h-[220px]">
+        <div className="absolute inset-0 bg-black/25"></div>
+        <div className="relative max-w-7xl mx-auto h-full flex items-center justify-center">
+          <div className="text-center animate-fade-in w-full py-4">
+            <div className="mb-4">
+              <Link to="/research" className="text-white/80 hover:text-white transition-colors inline-flex items-center text-sm">
+                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                </svg>
+                Back to Research
+              </Link>
+            </div>
+            <h1 className="text-2xl md:text-4xl font-bold mt-20">Research Opportunities</h1>
+            <p className="text-sm md:text-base text-white/90 max-w-2xl mx-auto">
+              Discover positions available for students and faculty to engage in meaningful research
+            </p>
           </div>
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">Research Opportunities</h1>
-          <p className="text-xl text-white/90 max-w-2xl">
-            Discover positions available for students and faculty to engage in meaningful research
-          </p>
         </div>
       </section>
 
@@ -97,11 +99,10 @@ const ResearchOpportunities = () => {
               <button
                 key={type}
                 onClick={() => setSelectedType(type)}
-                className={`px-5 py-2 rounded-full text-sm font-semibold transition-all duration-300 ${
-                  selectedType === type
-                    ? 'bg-primary-600 text-white shadow-lg scale-105'
-                    : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
-                }`}
+                className={`px-5 py-2 rounded-full text-sm font-semibold transition-all duration-300 ${selectedType === type
+                  ? 'bg-primary-600 text-white shadow-lg scale-105'
+                  : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                  }`}
               >
                 {type}
               </button>
@@ -139,7 +140,7 @@ const ResearchOpportunities = () => {
                     <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
                       {opportunity.title}
                     </h3>
-                    
+
                     <p className="text-sm text-primary-600 dark:text-primary-400 font-semibold mb-3">
                       {opportunity.department}
                     </p>
@@ -180,7 +181,7 @@ const ResearchOpportunities = () => {
       </section>
 
       {/* Contact CTA */}
-      <section className="py-16 px-4 bg-white dark:bg-gray-800">
+      <section className="py-8 px-4 bg-white dark:bg-gray-800">
         <div className="max-w-4xl mx-auto text-center">
           <RevealOnScroll animation="animate-fade-up">
             <h2 className="text-3xl font-bold mb-4 text-gray-900 dark:text-white">Have Questions?</h2>

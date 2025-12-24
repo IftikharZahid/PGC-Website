@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
+import crypto from 'crypto';
 
 const studentSchema = new mongoose.Schema({
   studentId: {
@@ -38,6 +39,14 @@ const studentSchema = new mongoose.Schema({
     type: String,
     default: ''
   },
+  resetPasswordToken: {
+    type: String,
+    default: null
+  },
+  resetPasswordExpires: {
+    type: Date,
+    default: null
+  },
   createdAt: {
     type: Date,
     default: Date.now
@@ -66,10 +75,28 @@ studentSchema.methods.comparePassword = async function(candidatePassword) {
   return await bcrypt.compare(candidatePassword, this.password);
 };
 
+// Method to generate password reset token
+studentSchema.methods.generatePasswordResetToken = function() {
+  const resetToken = crypto.randomBytes(32).toString('hex');
+  
+  // Hash the token and store in database
+  this.resetPasswordToken = crypto
+    .createHash('sha256')
+    .update(resetToken)
+    .digest('hex');
+  
+  // Set expiry to 1 hour from now
+  this.resetPasswordExpires = Date.now() + 60 * 60 * 1000; // 1 hour
+  
+  return resetToken; // Return unhashed token to send to user
+};
+
 // Method to get user without password
 studentSchema.methods.toJSON = function() {
   const obj = this.toObject();
   delete obj.password;
+  delete obj.resetPasswordToken;
+  delete obj.resetPasswordExpires;
   delete obj.__v;
   return obj;
 };

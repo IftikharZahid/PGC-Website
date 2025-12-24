@@ -134,29 +134,31 @@ const LibraryCatalog = () => {
   const filteredBooks = books.filter(book => {
     const matchesCategory = selectedCategory === 'All' || book.category === selectedCategory;
     const matchesSearch = book.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         book.author.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         book.isbn.includes(searchTerm);
+      book.author.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      book.isbn.includes(searchTerm);
     return matchesCategory && matchesSearch;
   });
 
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="relative pt-32 pb-16 px-4 bg-gradient-to-br from-primary-600 to-secondary-700 text-white overflow-hidden">
-        <div className="absolute inset-0 bg-black/20"></div>
-        <div className="relative max-w-7xl mx-auto">
-          <div className="flex items-center mb-6">
-            <Link to="/library" className="text-white/80 hover:text-white transition-colors flex items-center">
-              <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-              </svg>
-              Back to Library
-            </Link>
+      <section className="relative px-4 bg-secondary-700 text-white overflow-hidden h-[200px] md:h-[220px]">
+        <div className="absolute inset-0 bg-black/25"></div>
+        <div className="relative max-w-7xl mx-auto h-full flex items-center justify-center">
+          <div className="text-center animate-fade-in w-full py-4">
+            <div className="mb-4">
+              <Link to="/library" className="text-white/80 hover:text-white transition-colors inline-flex items-center text-sm">
+                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                </svg>
+                Back to Library
+              </Link>
+            </div>
+            <h1 className="text-2xl md:text-4xl font-bold mt-20">Library Catalog</h1>
+            <p className="text-sm md:text-base text-white/90 max-w-2xl mx-auto">
+              Browse our collection of books and resources
+            </p>
           </div>
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">Library Catalog</h1>
-          <p className="text-xl text-white/90 max-w-2xl">
-            Browse our collection of books and resources
-          </p>
         </div>
       </section>
 
@@ -185,11 +187,10 @@ const LibraryCatalog = () => {
               <button
                 key={category}
                 onClick={() => setSelectedCategory(category)}
-                className={`px-5 py-2 rounded-full text-sm font-semibold transition-all duration-300 ${
-                  selectedCategory === category
-                    ? 'bg-primary-600 text-white shadow-lg scale-105'
-                    : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
-                }`}
+                className={`px-5 py-2 rounded-full text-sm font-semibold transition-all duration-300 ${selectedCategory === category
+                  ? 'bg-primary-600 text-white shadow-lg scale-105'
+                  : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                  }`}
               >
                 {category}
               </button>
@@ -220,11 +221,10 @@ const LibraryCatalog = () => {
                       <span className="text-xs font-bold uppercase tracking-wider bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-400 px-3 py-1 rounded-full">
                         {book.category}
                       </span>
-                      <span className={`text-xs font-bold px-3 py-1 rounded-full ${
-                        book.available 
-                          ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400'
-                          : 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400'
-                      }`}>
+                      <span className={`text-xs font-bold px-3 py-1 rounded-full ${book.available
+                        ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400'
+                        : 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400'
+                        }`}>
                         {book.available ? 'Available' : 'Borrowed'}
                       </span>
                     </div>
@@ -261,12 +261,11 @@ const LibraryCatalog = () => {
 
                   {/* Action Button */}
                   <div className="p-6 pt-0">
-                    <button 
-                      className={`w-full py-3 rounded-lg font-semibold transition-colors ${
-                        book.available
-                          ? 'bg-primary-600 hover:bg-primary-700 text-white'
-                          : 'bg-gray-300 dark:bg-gray-600 text-gray-500 dark:text-gray-400 cursor-not-allowed'
-                      }`}
+                    <button
+                      className={`w-full py-3 rounded-lg font-semibold transition-colors ${book.available
+                        ? 'bg-primary-600 hover:bg-primary-700 text-white'
+                        : 'bg-gray-300 dark:bg-gray-600 text-gray-500 dark:text-gray-400 cursor-not-allowed'
+                        }`}
                       disabled={!book.available}
                     >
                       {book.available ? 'Request Book' : 'Currently Unavailable'}
