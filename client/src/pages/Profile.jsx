@@ -124,7 +124,7 @@ const Profile = () => {
   };
 
   if (!user) {
-    navigate('/login');
+    navigate('/student-login');
     return null;
   }
 
@@ -172,7 +172,7 @@ const Profile = () => {
                   {getInitials(user.name)}
                 </div>
               )}
-              
+
               {/* Upload Button Overlay */}
               <label
                 htmlFor="profile-upload"

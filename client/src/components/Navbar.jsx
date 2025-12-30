@@ -3,6 +3,7 @@ import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useTheme } from "../context/ThemeContext";
 import logo from "../assets/punjab-college-logo.png";
+import logoDark from "../assets/pgc-footer-logo.png";
 import placeholder from "../assets/student-portrait.png";
 
 
@@ -48,7 +49,7 @@ const Navbar = () => {
 
             {/* Logo */}
             <Link to="/" className="flex-shrink-0 flex items-center group">
-              <img className="h-12 w-auto md:h-14 transition-transform group-hover:scale-105 rounded-lg" src={logo} alt="PUNJAB COLLEGE" />
+              <img className="h-12 w-auto md:h-14 transition-transform group-hover:scale-105 rounded-lg" src={isDarkMode ? logoDark : logo} alt="PUNJAB COLLEGE" />
               <div className="ml-4 flex flex-col justify-center">
                 <span className="text-lg md:text-xl font-serif font-bold text-gray-900 dark:text-white leading-none tracking-tight group-hover:text-primary-600 transition-colors">
                   PUNJAB COLLEGE
@@ -142,13 +143,18 @@ const Navbar = () => {
                   {/* Profile Dropdown */}
                   {showProfileMenu && (
                     <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-xl py-1 border border-gray-100 dark:border-gray-700 text-gray-800 dark:text-gray-200 animate-fade-in z-50">
-                      <Link to="/student-dashboard" className="block px-4 py-2 hover:bg-gray-50 dark:hover:bg-gray-700 text-sm">Dashboard</Link>
+                      <Link
+                        to={user.role === 'admin' ? '/admin-dashboard' : user.role === 'teacher' ? '/teacher-dashboard' : '/student-dashboard'}
+                        className="block px-4 py-2 hover:bg-gray-50 dark:hover:bg-gray-700 text-sm"
+                      >
+                        Dashboard
+                      </Link>
                       <button onClick={logout} className="block w-full text-left px-4 py-2 hover:bg-gray-50 dark:hover:bg-gray-700 text-red-600 text-sm">Logout</button>
                     </div>
                   )}
                 </div>
               ) : (
-                <Link to="/login" className="bg-primary-600 text-white hover:!text-white px-5 py-2 rounded-full font-bold text-sm hover:bg-primary-700 transition-colors shadow-md hover:shadow-lg transform hover:-translate-y-0.5">
+                <Link to="/student-login" className="bg-primary-600 text-white hover:!text-white px-5 py-2 rounded-full font-bold text-sm hover:bg-primary-700 transition-colors shadow-md hover:shadow-lg transform hover:-translate-y-0.5">
                   Student Portal
                 </Link>
               )}
@@ -216,7 +222,7 @@ const Navbar = () => {
                     </div>
                   </div>
                 ) : (
-                  <Link to="/login" className="block w-full text-center px-4 py-2 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-primary-600 hover:bg-primary-700">
+                  <Link to="/student-login" className="block w-full text-center px-4 py-2 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-primary-600 hover:bg-primary-700">
                     Log In
                   </Link>
                 )}

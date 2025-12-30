@@ -2,6 +2,11 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import mongoose from 'mongoose';
+import helmet from 'helmet';
+import rateLimit from 'express-rate-limit';
+import mongoSanitize from 'express-mongo-sanitize';
+import xss from 'xss-clean';
+import hpp from 'hpp';
 import connectDB from './config/database.js';
 import coursesRouter from './routes/courses.js';
 import authRouter from './routes/auth.js';
@@ -11,6 +16,9 @@ import resultsRouter from './routes/results.js';
 import newsRouter from './routes/news.js';
 import studentPortalRouter from './routes/student-portal.js';
 import studentsRouter from './routes/students.js';
+import teachersRouter from './routes/teachers.js';
+import videoLecturesRouter from './routes/video-lectures.js';
+import attendanceRouter from './routes/attendance.js';
 
 // Load environment variables
 dotenv.config();
@@ -29,6 +37,31 @@ connectDB().then(() => {
 
 // Middleware
 app.use(cors());
+
+// Security Enhancements
+// 1. Set Security HTTP Headers
+app.use(helmet());
+
+// 2. Data Sanitization against NoSQL Query Injection
+app.use(mongoSanitize());
+
+// 3. Data Sanitization against XSS
+app.use(xss());
+
+// 4. Prevent Parameter Pollution
+app.use(hpp());
+
+// 5. Rate Limiting
+const limiter = rateLimit({
+  windowMs: 10 * 60 * 1000, // 10 minutes
+  max: 100, // Limit each IP to 100 requests per 10 mins
+  message: {
+    success: false,
+    message: 'Too many requests from this IP, please try again after 10 minutes.'
+  }
+});
+app.use('/api', limiter);
+
 app.use(express.json({ limit: '50mb' })); // Increased limit for base64 images
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
@@ -61,6 +94,9 @@ app.use('/api/results', resultsRouter);
 app.use('/api/news', newsRouter);
 app.use('/api/student-portal', studentPortalRouter);
 app.use('/api/students', studentsRouter);
+app.use('/api/teachers', teachersRouter);
+app.use('/api/video-lectures', videoLecturesRouter);
+app.use('/api/attendance', attendanceRouter);
 
 // Root endpoint
 app.get('/', (req, res) => {

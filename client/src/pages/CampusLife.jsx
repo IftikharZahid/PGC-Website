@@ -1,12 +1,27 @@
-import React from 'react';
 import RevealOnScroll from '../components/RevealOnScroll';
-import collegeBuilding from '../assets/College-Building.png';
-import graduatingStudents from '../assets/graduating-students.jpg';
+import PageHero from '../components/PageHero';
+import { getItems, STORAGE_KEYS, initializeDemoData } from '../utils/adminStorage';
+
 import scienceLaboratory from '../assets/science-laboratory.JPG';
 import modernLibrary from '../assets/modern-library.png';
 import sportsComplex from '../assets/sports-complex.jpg';
 
 const CampusLife = () => {
+  // Initialize data immediately without loading delay
+  const gallery = (() => {
+    initializeDemoData();
+    const galleryItems = getItems(STORAGE_KEYS.GALLERY);
+    const galleryMap = {};
+    if (galleryItems && galleryItems.length > 0) {
+      galleryItems.forEach(item => {
+        galleryMap[item.id] = item.url;
+      });
+    }
+    return galleryMap;
+  })();
+
+  const getImg = (id, fallback) => gallery[id] || fallback;
+
   const societies = [
     {
       title: "Debating Society",
@@ -44,34 +59,26 @@ const CampusLife = () => {
     {
       title: "Modern Library",
       desc: "A vast collection of books, journals, and digital resources to support academic research.",
-      image: modernLibrary
+      image: getImg('cl-lib', modernLibrary)
     },
     {
       title: "Science Labs",
       desc: "State-of-the-art physics, chemistry, and computer laboratories for practical learning.",
-      image: scienceLaboratory
+      image: getImg('cl-lab', scienceLaboratory)
     },
     {
       title: "Sports Complex",
       desc: "Facilities for cricket, football, badminton, and indoor games.",
-      image: sportsComplex
+      image: getImg('cl-sports', sportsComplex)
     }
   ];
 
   return (
     <div className="min-h-screen">
-      {/* Hero Section */}
-      <section className="relative px-4 bg-secondary-700 text-white overflow-hidden h-[180px] md:h-[200px]">
-        <div className="absolute inset-0 bg-black/25"></div>
-        <div className="relative max-w-7xl mx-auto h-full flex items-center justify-center">
-          <div className="text-center animate-fade-in w-full py-4">
-            <h1 className="text-2xl md:text-4xl font-bold mt-20">Campus Life</h1>
-            <p className="text-sm md:text-base text-white/90 max-w-2xl mx-auto">
-              Beyond the classroom: A vibrant community of learners, leaders, and change-makers.
-            </p>
-          </div>
-        </div>
-      </section>
+      <PageHero
+        title="Campus Life"
+        subtitle="A vibrant community of learners, leaders, and change-makers."
+      />
 
       {/* Societies Grid */}
       <section className="py-6 px-4 bg-white dark:bg-gray-800">

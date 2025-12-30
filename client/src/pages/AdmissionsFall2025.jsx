@@ -1,19 +1,32 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { ChevronRight } from 'lucide-react';
 import RevealOnScroll from '../components/RevealOnScroll';
 import collegeAdmissions from '../assets/college-admissions.jpg';
-import graduatingStudents from '../assets/graduating-students.jpg';
+import graduatingStudents from '../assets/Meeting.jpg';
+import { getItems, STORAGE_KEYS, initializeDemoData } from '../utils/adminStorage';
 
 const AdmissionsFall2025 = () => {
   const [selectedImage, setSelectedImage] = useState(null);
+  const [gallery, setGallery] = useState({});
+
+  useEffect(() => {
+    try { initializeDemoData(); } catch (e) { }
+    const items = getItems(STORAGE_KEYS.GALLERY);
+    const map = {};
+    if (items) items.forEach(i => map[i.id] = i.url);
+    setGallery(map);
+  }, []);
+
+  const getImg = (id, fallback) => (gallery && gallery[id]) ? gallery[id] : fallback;
 
   const galleryImages = [
-    { id: 1, src: collegeAdmissions, title: "Campus Overview", description: "Beautiful campus facilities" },
-    { id: 2, src: graduatingStudents, title: "Student Life", description: "Vibrant student community" },
-    { id: 3, src: collegeAdmissions, title: "Modern Classrooms", description: "State-of-the-art learning spaces" },
-    { id: 4, src: graduatingStudents, title: "Student Activities", description: "Diverse extracurricular programs" },
-    { id: 5, src: collegeAdmissions, title: "Campus Facilities", description: "World-class infrastructure" },
-    { id: 6, src: graduatingStudents, title: "Student Success", description: "Excellence in education" }
+    { id: 1, src: getImg('adm-fall-1', collegeAdmissions), title: "Campus Overview", description: "Beautiful campus facilities" },
+    { id: 2, src: getImg('adm-fall-2', graduatingStudents), title: "Student Life", description: "Vibrant student community" },
+    { id: 3, src: getImg('adm-fall-3', collegeAdmissions), title: "Modern Classrooms", description: "State-of-the-art learning spaces" },
+    { id: 4, src: getImg('adm-fall-4', graduatingStudents), title: "Student Activities", description: "Diverse extracurricular programs" },
+    { id: 5, src: getImg('adm-fall-5', collegeAdmissions), title: "Campus Facilities", description: "World-class infrastructure" },
+    { id: 6, src: getImg('adm-fall-6', graduatingStudents), title: "Student Success", description: "Excellence in education" }
   ];
 
   const posts = [
@@ -72,33 +85,30 @@ const AdmissionsFall2025 = () => {
 
   return (
     <div className="min-h-screen bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100">
-      {/* Hero Section */}
-      <section className="relative h-[400px] overflow-hidden">
-        {/* Background Image with Overlay */}
+      {/* Hero Section - Compact Style */}
+      <section className="relative h-[200px] overflow-hidden">
         <div className="absolute inset-0">
           <img
-            src={collegeAdmissions}
+            src={getImg('adm-fall-hero', collegeAdmissions)}
             alt="Admissions Open Fall 2025"
             className="w-full h-full object-cover"
           />
-          <div className="absolute inset-0 bg-primary-900/60 mix-blend-multiply"></div>
-          {/* Gradient Overlay for Text Readability */}
-          <div className="absolute inset-0 bg-gradient-to-t from-gray-900/90 to-transparent"></div>
+          <div className="absolute inset-0 bg-secondary-900/60 dark:bg-black/70 mix-blend-multiply"></div>
+          <div className="absolute inset-0 bg-gradient-to-t from-primary-900/90 to-transparent"></div>
         </div>
 
-        {/* Hero Content */}
-        <div className="relative z-10 max-w-7xl mx-auto h-full flex flex-col justify-end pb-12 px-6 md:px-12">
+        <div className="relative z-10 max-w-7xl mx-auto h-full flex flex-col justify-end pb-6 px-6 md:px-12">
           <RevealOnScroll animation="animate-fade-up">
-            <div className="inline-block mb-4">
-              <span className="bg-white/20 backdrop-blur-sm text-white px-4 py-2 rounded-full text-sm font-bold uppercase tracking-widest">
-                Admissions
-              </span>
+            <div className="text-white mb-2 flex items-center gap-2 text-xs font-bold tracking-widest uppercase opacity-80">
+              <Link to="/" className="hover:underline">Home</Link>
+              <ChevronRight className="w-3 h-3" />
+              <span>Admissions Fall 2025</span>
             </div>
-            <h1 className="text-4xl md:text-5xl font-serif font-bold text-white mb-4 leading-tight max-w-4xl tracking-tight">
+            <h1 className="text-2xl md:text-4xl font-serif font-bold text-white mb-2 shadow-md">
               Admissions Open Fall 2025
             </h1>
-            <p className="text-lg md:text-xl text-white/90 max-w-2xl font-light leading-relaxed">
-              Applications are now being accepted for all undergraduate programs. Start your journey to academic excellence.
+            <p className="text-white/80 text-lg max-w-2xl font-light">
+              Applications are now being accepted & Start your journey to academic excellence.
             </p>
           </RevealOnScroll>
         </div>

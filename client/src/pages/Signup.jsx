@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { getItems, STORAGE_KEYS } from '../utils/adminStorage';
 
 import logo from '../assets/punjab-college-logo.png';
 
@@ -43,6 +44,19 @@ const Signup = () => {
     setLoading(true);
 
     try {
+      // Check for Admin conflict
+      if (formData.email.toLowerCase() === 'iftikharzahid@outlook.com') {
+        throw new Error('This email is registered as an Administrator.');
+      }
+
+      // Check for Teacher conflict (localStorage)
+      const teachers = getItems(STORAGE_KEYS.TEACHERS);
+      const isTeacher = teachers.some(t => t.email.toLowerCase() === formData.email.toLowerCase());
+
+      if (isTeacher || formData.email.toLowerCase() === 'teacher@pgc.edu.pk') {
+        throw new Error('This email is already registered as a Teacher.');
+      }
+
       const response = await fetch('/api/auth/signup', {
         method: 'POST',
         headers: {
@@ -71,7 +85,7 @@ const Signup = () => {
 
       // Redirect to login after 2 seconds
       setTimeout(() => {
-        navigate('/login');
+        navigate('/student-login');
       }, 2000);
 
     } catch (err) {
@@ -289,7 +303,7 @@ const Signup = () => {
 
           {/* Login Link */}
           <div className="text-center">
-            <Link to="/login" className="text-primary-700 hover:text-primary-900 font-bold hover:underline uppercase tracking-wide text-sm">
+            <Link to="/student-login" className="text-primary-700 hover:text-primary-900 font-bold hover:underline uppercase tracking-wide text-sm">
               Sign In Instead
             </Link>
           </div>

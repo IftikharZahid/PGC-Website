@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import PageHero from '../components/PageHero';
 
 const Programs = () => {
   const [programs, setPrograms] = useState([]);
@@ -117,18 +118,10 @@ const Programs = () => {
 
   return (
     <div className="min-h-screen">
-      {/* Hero Section */}
-      <section className="relative px-4 bg-secondary-700 text-white overflow-hidden h-[180px] md:h-[200px]">
-        <div className="absolute inset-0 bg-black/25"></div>
-        <div className="relative max-w-7xl mx-auto h-full flex items-center justify-center">
-          <div className="text-center animate-fade-in w-full py-4">
-            <h1 className="text-2xl md:text-4xl font-bold mt-20">Our Programs</h1>
-            <p className="text-sm md:text-base text-white/90 max-w-3xl mx-auto">
-              Discover our wide range of programs designed to help you achieve your academic and career goals.
-            </p>
-          </div>
-        </div>
-      </section>
+      <PageHero
+        title="Our Programs"
+        subtitle="Discover our wide range of programs designed to help you achieve your academic and career goals."
+      />
 
       <div className="px-4 py-6 bg-gray-50 dark:bg-gray-900">
         <div className="max-w-7xl mx-auto">

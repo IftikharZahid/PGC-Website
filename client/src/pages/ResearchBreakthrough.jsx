@@ -1,19 +1,42 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import { ChevronRight } from 'lucide-react';
 import RevealOnScroll from '../components/RevealOnScroll';
 import researchLaboratory from '../assets/research-laboratory.jpg';
 import scienceLaboratory from '../assets/science-laboratory.JPG';
+import { getItems, STORAGE_KEYS, initializeDemoData } from '../utils/adminStorage';
 
 const ResearchBreakthrough = () => {
   const [selectedImage, setSelectedImage] = useState(null);
+  const [gallery, setGallery] = useState({});
+
+  useEffect(() => {
+    // Initialize and load gallery data
+    initializeDemoData();
+    const galleryItems = getItems(STORAGE_KEYS.GALLERY);
+    const galleryMap = {};
+    if (galleryItems && galleryItems.length > 0) {
+      galleryItems.forEach(item => {
+        galleryMap[item.id] = item.url;
+      });
+    }
+    setGallery(galleryMap);
+  }, []);
+
+  // Helper to get image from gallery with fallback
+  const getImg = (id, fallback) => (gallery && gallery[id]) || fallback;
 
   const galleryImages = [
-    { id: 1, src: researchLaboratory, title: "Research Laboratory", description: "State-of-the-art research facilities" },
-    { id: 2, src: scienceLaboratory, title: "Science Laboratory", description: "Advanced scientific equipment" },
-    { id: 3, src: researchLaboratory, title: "Research Team", description: "Faculty conducting experiments" },
-    { id: 4, src: scienceLaboratory, title: "Lab Equipment", description: "Modern research instruments" },
-    { id: 5, src: researchLaboratory, title: "Data Analysis", description: "Analyzing research results" },
-    { id: 6, src: scienceLaboratory, title: "Innovation Hub", description: "Collaborative research space" }
+    { id: 1, imgId: 'research-1', src: getImg('research-1', researchLaboratory), title: "Research Laboratory", description: "State-of-the-art research facilities" },
+    { id: 2, imgId: 'research-2', src: getImg('research-2', scienceLaboratory), title: "Science Laboratory", description: "Advanced scientific equipment" },
+    { id: 3, imgId: 'research-3', src: getImg('research-3', researchLaboratory), title: "Research Team", description: "Faculty conducting experiments" },
+    { id: 4, imgId: 'research-4', src: getImg('research-4', scienceLaboratory), title: "Lab Equipment", description: "Modern research instruments" },
+    { id: 5, imgId: 'research-5', src: getImg('research-5', researchLaboratory), title: "Data Analysis", description: "Analyzing research results" },
+    { id: 6, imgId: 'research-6', src: getImg('research-6', scienceLaboratory), title: "Innovation Hub", description: "Collaborative research space" }
   ];
+
+  // Hero image from gallery
+  const heroImage = getImg('research-hero', researchLaboratory);
 
   const posts = [
     {
@@ -62,33 +85,30 @@ const ResearchBreakthrough = () => {
 
   return (
     <div className="min-h-screen bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100">
-      {/* Hero Section */}
-      <section className="relative h-[400px] overflow-hidden">
-        {/* Background Image with Overlay */}
+      {/* Hero Section - Compact Style matching Seminars */}
+      <section className="relative h-[200px] overflow-hidden">
         <div className="absolute inset-0">
           <img
-            src={researchLaboratory}
+            src={heroImage}
             alt="Research Breakthrough"
             className="w-full h-full object-cover"
           />
-          <div className="absolute inset-0 bg-primary-900/60 mix-blend-multiply"></div>
-          {/* Gradient Overlay for Text Readability */}
-          <div className="absolute inset-0 bg-gradient-to-t from-gray-900/90 to-transparent"></div>
+          <div className="absolute inset-0 bg-secondary-900/60 dark:bg-black/70 mix-blend-multiply"></div>
+          <div className="absolute inset-0 bg-gradient-to-t from-primary-900/90 to-transparent"></div>
         </div>
 
-        {/* Hero Content */}
-        <div className="relative z-10 max-w-7xl mx-auto h-full flex flex-col justify-end pb-12 px-6 md:px-12">
+        <div className="relative z-10 max-w-7xl mx-auto h-full flex flex-col justify-end pb-6 px-6 md:px-12">
           <RevealOnScroll animation="animate-fade-up">
-            <div className="inline-block mb-4">
-              <span className="bg-white/20 backdrop-blur-sm text-white px-4 py-2 rounded-full text-sm font-bold uppercase tracking-widest">
-                Academics
-              </span>
+            <div className="text-white mb-2 flex items-center gap-2 text-xs font-bold tracking-widest uppercase opacity-80">
+              <Link to="/" className="hover:underline">Home</Link>
+              <ChevronRight className="w-3 h-3" />
+              <span>Research Breakthrough</span>
             </div>
-            <h1 className="text-4xl md:text-5xl font-serif font-bold text-white mb-4 leading-tight max-w-4xl tracking-tight">
+            <h1 className="text-2xl md:text-4xl font-serif font-bold text-white mb-2 shadow-md">
               Research Breakthrough
             </h1>
-            <p className="text-lg md:text-xl text-white/90 max-w-2xl font-light leading-relaxed">
-              Faculty members publish groundbreaking research in international journals, advancing knowledge and innovation.
+            <p className="text-white/80 text-lg max-w-2xl font-light">
+              Faculty members publish groundbreaking research.
             </p>
           </RevealOnScroll>
         </div>

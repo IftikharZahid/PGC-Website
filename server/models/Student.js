@@ -9,6 +9,14 @@ const studentSchema = new mongoose.Schema({
     unique: true,
     index: true
   },
+  rollNo: {
+    type: String,
+    // unique: true, // Optional: duplicate roll numbers might happen if logic fails, better to warn than crash? 
+    // Let's make it unique but sparse to avoid unique index error on existing docs?
+    // Or just String. 
+    trim: true,
+    index: true
+  },
   name: {
     type: String,
     required: true,
@@ -35,6 +43,11 @@ const studentSchema = new mongoose.Schema({
     type: String,
     trim: true
   },
+  status: {
+    type: String,
+    default: 'Active',
+    enum: ['Active', 'Inactive']
+  },
   profilePicture: {
     type: String,
     default: ''
@@ -47,6 +60,10 @@ const studentSchema = new mongoose.Schema({
     type: Date,
     default: null
   },
+  role: {
+    type: String,
+    default: 'student'
+  },
   createdAt: {
     type: Date,
     default: Date.now
@@ -55,7 +72,7 @@ const studentSchema = new mongoose.Schema({
 
 // Generate student ID before saving
 // Generate student ID before saving
-studentSchema.pre('save', async function() {
+studentSchema.pre('save', async function () {
   // Only generate studentId if it's a new document
   if (this.isNew && !this.studentId) {
     const year = new Date().getFullYear();
@@ -71,28 +88,28 @@ studentSchema.pre('save', async function() {
 });
 
 // Method to compare passwords
-studentSchema.methods.comparePassword = async function(candidatePassword) {
+studentSchema.methods.comparePassword = async function (candidatePassword) {
   return await bcrypt.compare(candidatePassword, this.password);
 };
 
 // Method to generate password reset token
-studentSchema.methods.generatePasswordResetToken = function() {
+studentSchema.methods.generatePasswordResetToken = function () {
   const resetToken = crypto.randomBytes(32).toString('hex');
-  
+
   // Hash the token and store in database
   this.resetPasswordToken = crypto
     .createHash('sha256')
     .update(resetToken)
     .digest('hex');
-  
+
   // Set expiry to 1 hour from now
   this.resetPasswordExpires = Date.now() + 60 * 60 * 1000; // 1 hour
-  
+
   return resetToken; // Return unhashed token to send to user
 };
 
 // Method to get user without password
-studentSchema.methods.toJSON = function() {
+studentSchema.methods.toJSON = function () {
   const obj = this.toObject();
   delete obj.password;
   delete obj.resetPasswordToken;

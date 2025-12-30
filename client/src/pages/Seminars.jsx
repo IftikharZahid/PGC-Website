@@ -1,18 +1,25 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
+import { ChevronRight } from 'lucide-react';
 import RevealOnScroll from '../components/RevealOnScroll';
-import convocationCeremony from '../assets/convocation-ceremony.png';
-import graduatingStudents from '../assets/graduating-students.jpg';
+import collegeBuilding from '../assets/College-Building.png';
+import convocationCeremony01 from '../assets/Seminar01.png';
+import convocationCeremony02 from '../assets/Seminar02.jpg';
+import convocationCeremony03 from '../assets/Seminar03.jpg';
+import convocationCeremony04 from '../assets/Seminar04.jpg';
+import convocationCeremony05 from '../assets/Seminar05.png';
+import convocationCeremony06 from '../assets/Seminar06.png';
 
 const Seminars = () => {
   const [selectedImage, setSelectedImage] = useState(null);
 
   const galleryImages = [
-    { id: 1, src: convocationCeremony, title: "Seminar Session", description: "Expert speakers sharing knowledge and insights" },
-    { id: 2, src: graduatingStudents, title: "Engaged Audience", description: "Students actively participating in seminar sessions" },
-    { id: 3, src: convocationCeremony, title: "Distinguished Guests", description: "Renowned speakers and industry experts" },
-    { id: 4, src: graduatingStudents, title: "Workshop Activities", description: "Hands-on learning in interactive workshops" },
-    { id: 5, src: convocationCeremony, title: "Networking Sessions", description: "Attendees connecting and sharing ideas" },
-    { id: 6, src: graduatingStudents, title: "Memorable Moments", description: "Highlights from the seminar series" }
+    { id: 1, src: convocationCeremony01, title: "Seminar Session", description: "Expert speakers sharing knowledge and insights" },
+    { id: 2, src: convocationCeremony02, title: "Engaged Audience", description: "Students actively participating in seminar sessions" },
+    { id: 3, src: convocationCeremony03, title: "Distinguished Guests", description: "Renowned speakers and industry experts" },
+    { id: 4, src: convocationCeremony04, title: "Workshop Activities", description: "Hands-on learning in interactive workshops" },
+    { id: 5, src: convocationCeremony05, title: "Networking Sessions", description: "Attendees connecting and sharing ideas" },
+    { id: 6, src: convocationCeremony06, title: "Memorable Moments", description: "Highlights from the seminar series" }
   ];
 
   const posts = [
@@ -62,33 +69,30 @@ const Seminars = () => {
 
   return (
     <div className="min-h-screen bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100">
-      {/* Hero Section */}
-      <section className="relative h-[400px] overflow-hidden">
-        {/* Background Image with Overlay */}
+      {/* Hero Section - Compact Style matching VideoLectures */}
+      <section className="relative h-[200px] overflow-hidden">
         <div className="absolute inset-0">
           <img
-            src={convocationCeremony}
-            alt="Seminars 2025"
+            src={collegeBuilding}
+            alt="Seminars"
             className="w-full h-full object-cover"
           />
-          <div className="absolute inset-0 bg-primary-900/60 mix-blend-multiply"></div>
-          {/* Gradient Overlay for Text Readability */}
-          <div className="absolute inset-0 bg-gradient-to-t from-gray-900/90 to-transparent"></div>
+          <div className="absolute inset-0 bg-secondary-900/60 dark:bg-black/70 mix-blend-multiply"></div>
+          <div className="absolute inset-0 bg-gradient-to-t from-primary-900/90 to-transparent"></div>
         </div>
 
-        {/* Hero Content */}
-        <div className="relative z-10 max-w-7xl mx-auto h-full flex flex-col justify-end pb-12 px-6 md:px-12">
+        <div className="relative z-10 max-w-7xl mx-auto h-full flex flex-col justify-end pb-6 px-6 md:px-12">
           <RevealOnScroll animation="animate-fade-up">
-            <div className="inline-block mb-4">
-              <span className="bg-white/20 backdrop-blur-sm text-white px-4 py-2 rounded-full text-sm font-bold uppercase tracking-widest">
-                Events
-              </span>
+            <div className="text-white mb-2 flex items-center gap-2 text-xs font-bold tracking-widest uppercase opacity-80">
+              <Link to="/" className="hover:underline">Home</Link>
+              <ChevronRight className="w-3 h-3" />
+              <span>Seminars</span>
             </div>
-            <h1 className="text-4xl md:text-5xl font-serif font-bold text-white mb-4 leading-tight max-w-4xl tracking-tight">
-              Seminars 2025
+            <h1 className="text-2xl md:text-4xl font-serif font-bold text-white mb-2 shadow-md">
+              Seminars & Events
             </h1>
-            <p className="text-lg md:text-xl text-white/90 max-w-2xl font-light leading-relaxed">
-              Engaging seminars featuring industry experts, thought leaders, and interactive sessions to inspire and educate.
+            <p className="text-white/80 text-lg max-w-2xl font-light">
+              Industry experts, thought leaders, and interactive sessions to inspire and educate.
             </p>
           </RevealOnScroll>
         </div>

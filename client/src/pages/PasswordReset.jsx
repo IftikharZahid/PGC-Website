@@ -57,10 +57,10 @@ const PasswordReset = () => {
       }
 
       setSuccess(true);
-      
+
       // Redirect to login after 3 seconds
       setTimeout(() => {
-        navigate('/login');
+        navigate('/student-login');
       }, 3000);
 
     } catch (err) {
@@ -194,8 +194,8 @@ const PasswordReset = () => {
             </div>
 
             {/* Submit Button */}
-            <button 
-              type="submit" 
+            <button
+              type="submit"
               disabled={loading}
               className="w-full bg-primary-800 text-white rounded-md py-3 font-bold uppercase tracking-wide hover:bg-primary-900 transition-colors shadow-md disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             >
@@ -215,7 +215,7 @@ const PasswordReset = () => {
 
           {/* Back to Login */}
           <div className="mt-6 text-center">
-            <Link to="/login" className="text-sm text-primary-700 hover:text-primary-900 font-bold hover:underline">
+            <Link to="/student-login" className="text-sm text-primary-700 hover:text-primary-900 font-bold hover:underline">
               Back to Login
             </Link>
           </div>

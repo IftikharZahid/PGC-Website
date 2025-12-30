@@ -18,23 +18,25 @@ const connectDB = async () => {
 
     console.log(`✅ MongoDB Connected: ${conn.connection.host}`);
     console.log(`📊 Database: ${conn.connection.name}`);
-    
+
+
     // Handle connection events
     mongoose.connection.on('error', (err) => {
       console.error('❌ MongoDB connection error:', err.message);
     });
 
-    mongoose.connection.on('disconnected', () => {
-      console.log('⚠️  MongoDB disconnected. Attempting to reconnect...');
-    });
+    // Commented out to reduce console noise during connection issues
+    // mongoose.connection.on('disconnected', () => {
+    //   console.log('⚠️  MongoDB disconnected. Attempting to reconnect...');
+    // });
 
-    mongoose.connection.on('reconnected', () => {
-      console.log('✅ MongoDB reconnected successfully');
-    });
+    // mongoose.connection.on('reconnected', () => {
+    //   console.log('✅ MongoDB reconnected successfully');
+    // });
 
-    mongoose.connection.on('connecting', () => {
-      console.log('🔄 MongoDB connecting...');
-    });
+    // mongoose.connection.on('connecting', () => {
+    //   console.log('🔄 MongoDB connecting...');
+    // });
 
     return conn;
   } catch (error) {
@@ -47,7 +49,7 @@ const connectDB = async () => {
     console.error('      - Network Access → Add IP Address → "Allow Access from Anywhere" (0.0.0.0/0)');
     console.error('   4. Check if MongoDB Atlas cluster is active');
     console.error('   5. Verify username/password in connection string');
-    
+
     // Don't exit immediately in development to allow manual retry
     if (process.env.NODE_ENV === 'production') {
       process.exit(1);

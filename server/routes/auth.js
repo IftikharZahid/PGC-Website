@@ -1,13 +1,14 @@
 import express from 'express';
 import crypto from 'crypto';
 import Student from '../models/Student.js';
+import Teacher from '../models/Teacher.js';
 
 const router = express.Router();
 
 // POST /api/auth/signup - Register new student
 router.post('/signup', async (req, res) => {
   try {
-    const { name, email, password, confirmPassword, phone, class: studentClass } = req.body;
+    const { name, email, password, confirmPassword, phone, class: studentClass, rollNo, status } = req.body;
 
     // Validation
     if (!name || !email || !password || !confirmPassword) {
@@ -48,6 +49,8 @@ router.post('/signup', async (req, res) => {
     // Create new student
     const newStudent = await Student.create({
       studentId,
+      rollNo,
+      status: status || 'Active',
       name,
       email: email.toLowerCase(),
       password,
@@ -104,7 +107,7 @@ router.post('/login', async (req, res) => {
     }
 
     // Login successful - return user without password
-    const userWithoutPassword = user.toJSON();
+    const userWithoutPassword = { ...user.toJSON(), role: user.role || 'student' };
     res.json({
       success: true,
       message: 'Login successful',
@@ -113,6 +116,78 @@ router.post('/login', async (req, res) => {
 
   } catch (error) {
     console.error('Login error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error during login',
+      error: error.message
+    });
+  }
+});
+
+// POST /api/auth/teacher-login - Teacher login
+router.post('/teacher-login', async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    console.log('🔐 Teacher login attempt:', email);
+
+    // Validation
+    if (!email || !password) {
+      return res.status(400).json({
+        success: false,
+        message: 'Please provide email and password'
+      });
+    }
+
+    // Find teacher (explicitly select password since it's excluded by default)
+    const teacher = await Teacher.findOne({ email: email.toLowerCase() }).select('+password');
+    console.log('👤 Teacher found:', teacher ? teacher.name : 'NOT FOUND');
+
+    if (!teacher) {
+      return res.status(401).json({
+        success: false,
+        message: 'Invalid email or password'
+      });
+    }
+
+    // Check if teacher has a password set
+    console.log('🔑 Has password:', !!teacher.password);
+    if (!teacher.password) {
+      return res.status(401).json({
+        success: false,
+        message: 'Password not set. Please contact admin to set your password.'
+      });
+    }
+
+    // Check password using bcrypt
+    const isPasswordCorrect = await teacher.comparePassword(password);
+    console.log('✅ Password match:', isPasswordCorrect);
+
+    if (!isPasswordCorrect) {
+      return res.status(401).json({
+        success: false,
+        message: 'Invalid email or password'
+      });
+    }
+
+    // Check if teacher is active
+    if (teacher.status !== 'Active') {
+      return res.status(401).json({
+        success: false,
+        message: 'Your account is inactive. Please contact admin.'
+      });
+    }
+
+    // Login successful - return teacher without password
+    const teacherData = { ...teacher.toJSON(), role: 'teacher' };
+    console.log('🎉 Login successful for:', teacher.name);
+    res.json({
+      success: true,
+      message: 'Login successful',
+      data: teacherData
+    });
+
+  } catch (error) {
+    console.error('Teacher login error:', error);
     res.status(500).json({
       success: false,
       message: 'Server error during login',

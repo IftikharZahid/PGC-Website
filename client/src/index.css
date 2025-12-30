@@ -4,6 +4,42 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Dynamic Theme CSS Variables */
+:root {
+  --color-primary-main: #e13a27;
+  --color-primary-light: #ff7363;
+  --color-primary-dark: #a0271b;
+  --color-secondary-main: #2C2B6F;
+  --color-secondary-light: #534bf4;
+  --color-secondary-dark: #1d1c4a;
+}
+
+/* Theme-aware utility classes using CSS variables */
+.theme-primary {
+  background-color: var(--color-primary-main);
+}
+.theme-primary-light {
+  background-color: var(--color-primary-light);
+}
+.theme-primary-dark {
+  background-color: var(--color-primary-dark);
+}
+.theme-secondary {
+  background-color: var(--color-secondary-main);
+}
+.text-theme-primary {
+  color: var(--color-primary-main);
+}
+.text-theme-secondary {
+  color: var(--color-secondary-main);
+}
+.border-theme-primary {
+  border-color: var(--color-primary-main);
+}
+.ring-theme-primary {
+  --tw-ring-color: var(--color-primary-main);
+}
+
 /* Global Link Styles - Red Hover Effect */
 a {
   @apply transition-colors duration-200;

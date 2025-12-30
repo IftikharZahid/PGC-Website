@@ -1,36 +1,45 @@
-import React from 'react';
+import { useState, useEffect } from 'react';
 import RevealOnScroll from '../components/RevealOnScroll';
+import PageHero from '../components/PageHero';
+import { getItems, STORAGE_KEYS, initializeDemoData } from '../utils/adminStorage';
 import collegeBuilding from '../assets/College-Building.png';
 import Principal from '../assets/staff/SirAhamdRaza.png';
 
 const About = () => {
+  const [gallery, setGallery] = useState({});
+
+  useEffect(() => {
+    initializeDemoData();
+    const galleryItems = getItems(STORAGE_KEYS.GALLERY);
+    const galleryMap = {};
+    if (galleryItems && galleryItems.length > 0) {
+      galleryItems.forEach(item => {
+        galleryMap[item.id] = item.url;
+      });
+    }
+    setGallery(galleryMap);
+  }, []);
+
+  const getImg = (id, fallback) => gallery[id] || fallback;
   return (
     <div className="min-h-screen">
-      {/* Hero Section */}
-      <section className="relative px-4 bg-secondary-700 text-white overflow-hidden h-[180px] md:h-[200px]">
-        <div className="absolute inset-0 bg-black/25"></div>
-        <div className="relative max-w-7xl mx-auto h-full flex items-center justify-center">
-          <div className="text-center animate-fade-in w-full py-4">
-            <h1 className="text-2xl md:text-4xl font-bold mt-20">About Us</h1>
-            <p className="text-sm md:text-base text-white/90 max-w-2xl mx-auto">
-              A legacy of excellence, a future of innovation.
-            </p>
-          </div>
-        </div>
-      </section>
+      <PageHero
+        title="About Us"
+        subtitle="A legacy of excellence, a future of innovation."
+      />
 
       {/* Main Content */}
       <section className="py-10 px-4 bg-white dark:bg-gray-800">
         <div className="max-w-7xl mx-auto">
           <div className="grid md:grid-cols-2 gap-12 items-center mb-20">
             <RevealOnScroll animation="animate-fade-right">
-              <img 
-                src={collegeBuilding} 
-                alt="College Campus" 
+              <img
+                src={getImg('about-campus', collegeBuilding)}
+                alt="College Campus"
                 className="w-full h-auto rounded-2xl shadow-xl"
               />
             </RevealOnScroll>
-            
+
             <RevealOnScroll animation="animate-fade-left">
               <div>
                 <h2 className="text-3xl md:text-4xl font-bold mb-6 text-gray-900 dark:text-gray-100">
@@ -47,7 +56,7 @@ const About = () => {
           </div>
 
           <div className="grid md:grid-cols-2 gap-12 items-center">
-             <RevealOnScroll animation="animate-fade-right">
+            <RevealOnScroll animation="animate-fade-right">
               <div>
                 <h2 className="text-3xl md:text-4xl font-bold mb-6 text-gray-900 dark:text-gray-100">
                   Principal's Message
@@ -61,9 +70,9 @@ const About = () => {
             </RevealOnScroll>
 
             <RevealOnScroll animation="animate-fade-left">
-              <img 
-                src={Principal} 
-                alt="Principal" 
+              <img
+                src={getImg('about-principal', Principal)}
+                alt="Principal"
                 className="w-full max-w-md mx-auto h-auto rounded-2xl shadow-xl"
               />
             </RevealOnScroll>

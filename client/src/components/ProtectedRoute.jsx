@@ -19,7 +19,20 @@ const ProtectedRoute = ({ children }) => {
 
     // Redirect to login if not authenticated, save the attempted location
     if (!user) {
-        return <Navigate to="/login" state={{ from: location.pathname }} replace />;
+        return <Navigate to="/student-login" state={{ from: location.pathname }} replace />;
+    }
+
+    // Role-based redirection for non-students
+    if (user.role === 'admin') {
+        return <Navigate to="/admin-dashboard" replace />;
+    }
+    if (user.role === 'teacher') {
+        return <Navigate to="/teacher-dashboard" replace />;
+    }
+
+    // Ensure only students pass through
+    if (user.role !== 'student') {
+        return <Navigate to="/student-login" replace />;
     }
 
     // User is authenticated, render the protected component
