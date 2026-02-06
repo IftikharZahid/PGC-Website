@@ -38,7 +38,7 @@ A comprehensive, full-stack web application designed for the Punjab Group of Col
 - **Routing**: React Router DOM v6+
 - **Styling**: [Tailwind CSS](https://tailwindcss.com/) (Custom configuration with gradients, glassmorphism)
 - **Icons**: Lucide React
-- **State Management**: React Context API (Auth, Theme, Admin)
+- **State Management**: React Context API (Auth, Theme, Admin), Redux Toolkit with RTK Query
 
 ### Backend (Server)
 - **Runtime**: [Node.js](https://nodejs.org/)
@@ -120,6 +120,23 @@ NODE_ENV=development
 - `npm start`: Start production server.
 - `npm run dev`: Start development server (requires `nodemon`).
 - `node seed_students.js`: Populate database with dummy student data.
+
+## 📦 Build for Production
+
+### Frontend
+
+```bash
+cd client
+npm run build     # Creates dist/ folder
+npm run preview   # Preview production build
+```
+
+### Backend
+
+```bash
+cd server
+npm start        # Production mode
+```
 
 ## 👤 Developer Info
 
