@@ -8,6 +8,8 @@ import mongoSanitize from 'express-mongo-sanitize';
 import xss from 'xss-clean';
 import hpp from 'hpp';
 import compression from 'compression';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import connectDB from './config/database.js';
 import coursesRouter from './routes/courses.js';
 import authRouter from './routes/auth.js';
@@ -116,8 +118,14 @@ app.use('/api/notifications', notificationsRouter);
 app.use('/api/admission-notification', admissionNotificationRouter);
 app.use('/api/settings', settingsRouter);
 
-// Root endpoint
-app.get('/', (req, res) => {
+// Serve static files from React build (Production)
+if (process.env.NODE_ENV === 'production') {
+  const __dirname = path.dirname(fileURLToPath(import.meta.url));
+  app.use(express.static(path.join(__dirname, '../client/dist')));
+}
+
+// API Root endpoint
+app.get('/api', (req, res) => {
   res.json({
     message: 'Welcome to College Management API',
     version: '1.0.0',
@@ -131,6 +139,14 @@ app.get('/', (req, res) => {
     }
   });
 });
+
+// Handle React routing - send all non-API requests to index.html (Production)
+if (process.env.NODE_ENV === 'production') {
+  app.get('*', (req, res) => {
+    const __dirname = path.dirname(fileURLToPath(import.meta.url));
+    res.sendFile(path.join(__dirname, '../client/dist/index.html'));
+  });
+}
 
 // 404 handler
 app.use((req, res) => {

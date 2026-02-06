@@ -1,39 +1,32 @@
 {
-<<<<<<< HEAD
-  "dependencies": {
-    "mongodb": "^7.0.0"
-=======
-  "name": "client",
-  "private": true,
-  "version": "0.0.0",
+  "name": "pgc-website",
+  "version": "1.0.0",
+  "description": "College Management Website - Punjab Group of Colleges",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "lint": "eslint .",
-    "preview": "vite preview",
-    "predeploy": "npm run build",
-    "deploy": "gh-pages -d dist"
+    "start": "node server/server.js",
+    "server": "cd server && npm install && npm start",
+    "client": "cd client && npm install && npm run dev",
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "build": "cd client && npm install && npm run build",
+    "install-all": "npm install && cd server && npm install && cd ../client && npm install"
   },
+  "keywords": [
+    "college",
+    "management",
+    "education",
+    "pgc"
+  ],
+  "author": "Iftikhar Zahid",
+  "license": "ISC",
   "dependencies": {
-    "react": "^19.2.0",
-    "react-dom": "^19.2.0",
-    "react-router-dom": "^7.10.1"
+    "mongodb": "^7.0.0"
   },
   "devDependencies": {
-    "@eslint/js": "^9.39.1",
-    "@types/react": "^19.2.5",
-    "@types/react-dom": "^19.2.3",
-    "@vitejs/plugin-react": "^5.1.1",
-    "autoprefixer": "^10.4.20",
-    "eslint": "^9.39.1",
-    "eslint-plugin-react-hooks": "^7.0.1",
-    "eslint-plugin-react-refresh": "^0.4.24",
-    "gh-pages": "^6.3.0",
-    "globals": "^16.5.0",
-    "postcss": "^8.4.49",
-    "tailwindcss": "^3.4.16",
-    "vite": "^7.2.4"
->>>>>>> aea8e07c86f5fa108291a6a5dca5036992ed385b
+    "concurrently": "^8.2.2"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
   }
 }
