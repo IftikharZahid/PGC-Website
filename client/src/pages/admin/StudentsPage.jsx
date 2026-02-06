@@ -1,60 +1,37 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { Plus, Edit2, Trash2, Search, Users } from 'lucide-react';
 import DataTable from '../../components/admin/DataTable';
 import ConfirmDialog from '../../components/admin/ConfirmDialog';
 import StudentForm from '../../components/admin/StudentForm';
-import { getItems, deleteItem, STORAGE_KEYS, logActivity } from '../../utils/adminStorage';
+import { logActivity } from '../../utils/adminStorage';
 import { useAdmin } from '../../context/AdminContext';
+import { useGetStudentsQuery, useDeleteStudentMutation } from '../../store/api/studentsApi';
 
 const StudentsPage = () => {
-    const [students, setStudents] = useState([]);
+    // RTK Query
+    const { data: studentsData, isLoading } = useGetStudentsQuery();
+    const [deleteStudent] = useDeleteStudentMutation();
+
+    const students = useMemo(() => {
+        if (!studentsData?.success) return [];
+        return studentsData.data.map(s => ({
+            ...s,
+            id: s._id,
+            rollNo: s.rollNo || s.studentId || 'N/A',
+            course: s.class ? s.class.split(' - ')[0] : '',
+            semester: s.class ? s.class.split(' - ')[1] : '',
+            status: s.status || 'Active'
+        }));
+    }, [studentsData]);
+
     const [showForm, setShowForm] = useState(false);
     const [editingStudent, setEditingStudent] = useState(null);
     const [deleteDialog, setDeleteDialog] = useState({ isOpen: false, student: null });
-    const { showNotification, refreshTrigger } = useAdmin();
-    const [isLoading, setIsLoading] = useState(true);
+    const { showNotification } = useAdmin();
 
     // Filters
     const [rollNoFilter, setRollNoFilter] = useState('');
     const [classFilter, setClassFilter] = useState('');
-
-    useEffect(() => {
-        loadStudents();
-
-        const handleRefresh = () => loadStudents();
-        window.addEventListener('storage', handleRefresh);
-        window.addEventListener('focus', handleRefresh);
-
-        return () => {
-            window.removeEventListener('storage', handleRefresh);
-            window.removeEventListener('focus', handleRefresh);
-        };
-    }, [refreshTrigger]);
-
-    const loadStudents = async () => {
-        setIsLoading(true);
-        try {
-            const response = await fetch('/api/students');
-            const data = await response.json();
-
-            if (data.success) {
-                const mapped = data.data.map(s => ({
-                    ...s,
-                    id: s._id,
-                    rollNo: s.rollNo || s.studentId || 'N/A',
-                    course: s.class ? s.class.split(' - ')[0] : '',
-                    semester: s.class ? s.class.split(' - ')[1] : '',
-                    status: s.status || 'Active'
-                }));
-                setStudents(mapped);
-            }
-        } catch (error) {
-            console.error('Failed to load students', error);
-            showNotification('Failed to load students', 'error');
-        } finally {
-            setIsLoading(false);
-        }
-    };
 
     // Get unique classes for dropdown
     const uniqueClasses = useMemo(() => {
@@ -84,28 +61,18 @@ const StudentsPage = () => {
 
     const confirmDelete = async () => {
         try {
-            const response = await fetch(`/api/students/${deleteDialog.student.id}`, {
-                method: 'DELETE'
-            });
-            const data = await response.json();
-
-            if (data.success) {
-                logActivity('Student Deleted', `Deleted student: ${deleteDialog.student.name}`);
-                showNotification('Student deleted successfully', 'success');
-                loadStudents();
-                setDeleteDialog({ isOpen: false, student: null });
-            } else {
-                throw new Error(data.message);
-            }
+            await deleteStudent(deleteDialog.student.id).unwrap();
+            logActivity('Student Deleted', `Deleted student: ${deleteDialog.student.name}`);
+            showNotification('Student deleted successfully', 'success');
+            setDeleteDialog({ isOpen: false, student: null });
         } catch (error) {
-            showNotification('Failed to delete student', 'error');
+            showNotification(error.data?.message || 'Failed to delete student', 'error');
         }
     };
 
     const closeForm = () => {
         setShowForm(false);
         setEditingStudent(null);
-        loadStudents();
     };
 
     const columns = [
@@ -231,6 +198,7 @@ const StudentsPage = () => {
                 loading={isLoading}
                 searchable={false}
                 emptyMessage="No students found. Add your first student!"
+                disablePagination={true}
             />
 
             {/* Student Form Modal */}

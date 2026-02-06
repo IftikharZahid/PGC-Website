@@ -1,4 +1,8 @@
 import mongoose from 'mongoose';
+import dns from 'dns';
+
+// Force usage of Google DNS to fix SRV record resolution issues
+dns.setServers(['8.8.8.8', '8.8.4.4']);
 
 const connectDB = async () => {
   try {
@@ -6,7 +10,7 @@ const connectDB = async () => {
     const options = {
       serverSelectionTimeoutMS: 30000, // Increase timeout to 30 seconds
       socketTimeoutMS: 45000, // Socket timeout
-      family: 4, // Force IPv4 (fixes DNS issues on some networks)
+      family: 4, // Force IPv4 for reliable connection
       maxPoolSize: 10,
       minPoolSize: 2,
       retryWrites: true,

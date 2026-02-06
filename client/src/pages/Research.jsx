@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import RevealOnScroll from '../components/RevealOnScroll';
+import PageHero from '../components/PageHero';
 
 const Research = () => {
   const researchAreas = [
@@ -95,17 +96,10 @@ const Research = () => {
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="relative px-4 bg-secondary-700 text-white overflow-hidden h-[180px] md:h-[200px]">
-        <div className="absolute inset-0 bg-black/25"></div>
-        <div className="relative max-w-7xl mx-auto h-full flex items-center justify-center">
-          <div className="text-center animate-fade-in w-full py-4">
-            <h1 className="text-2xl md:text-4xl font-bold mt-20">Research & Innovation</h1>
-            <p className="text-sm md:text-base text-white/90 max-w-3xl mx-auto">
-              Advancing knowledge through cutting-edge research and innovation
-            </p>
-          </div>
-        </div>
-      </section>
+      <PageHero
+        title="Research & Innovation"
+        subtitle="Advancing knowledge through cutting-edge research and innovation"
+      />
 
       {/* Research Areas */}
       <section className="py-10 px-4 bg-white dark:bg-gray-800">
@@ -163,8 +157,8 @@ const Research = () => {
                         {project.department}
                       </span>
                       <span className={`text-xs font-bold px-3 py-1 rounded-full ${project.status === 'In Progress'
-                          ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400'
-                          : 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400'
+                        ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400'
+                        : 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400'
                         }`}>
                         {project.status}
                       </span>
@@ -231,15 +225,15 @@ const Research = () => {
       </section>
 
       {/* CTA Section */}
-      <section className="py-10 px-4 bg-secondary-700 text-white">
+      <section className="py-10 px-4 bg-secondary-700 dark:bg-gray-800 text-white">
         <div className="max-w-4xl mx-auto text-center">
           <RevealOnScroll animation="animate-fade-up">
-            <h2 className="text-3xl md:text-4xl font-bold mb-6">Get Involved in Research</h2>
-            <p className="text-xl mb-8 text-white/90">
+            <h2 className="text-3xl md:text-4xl font-bold mb-6 text-white">Get Involved in Research</h2>
+            <p className="text-xl mb-8 text-white/90 dark:text-gray-300">
               Join our research community and contribute to groundbreaking discoveries
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link to="/research/opportunities" className="bg-white text-primary-700 px-8 py-4 rounded-lg font-bold text-lg hover:bg-gray-100 transition-colors shadow-lg hover:shadow-xl transform hover:-translate-y-1 inline-block text-center">
+              <Link to="/research/opportunities" className="bg-white dark:bg-gray-700 text-primary-700 dark:text-white px-8 py-4 rounded-lg font-bold text-lg hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors shadow-lg hover:shadow-xl transform hover:-translate-y-1 inline-block text-center">
                 Explore Opportunities
               </Link>
               <Link to="/research/contact" className="bg-transparent border-2 border-white text-white px-8 py-4 rounded-lg font-bold text-lg hover:bg-white/10 transition-colors inline-block text-center">

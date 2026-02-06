@@ -13,7 +13,7 @@ const NotFound = () => {
 
             <div className="max-w-md w-full text-center relative z-10 animate-fade-in-up">
                 {/* Error Code */}
-                <h1 className="text-[150px] font-black text-primary-900 leading-none drop-shadow-sm select-none opacity-90">
+                <h1 className="text-6xl sm:text-9xl md:text-[150px] font-black text-primary-900 leading-none drop-shadow-sm select-none opacity-90 mb-4 sm:mb-0">
                     404
                 </h1>
 

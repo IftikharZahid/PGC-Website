@@ -2,13 +2,32 @@ import { useState, useMemo } from 'react';
 import { CheckCircle, XCircle, Search } from 'lucide-react';
 import DataTable from '../../components/admin/DataTable';
 import ConfirmDialog from '../../components/admin/ConfirmDialog';
-import { getItems, updateItem, addItem, STORAGE_KEYS, logActivity } from '../../utils/adminStorage';
 import { useAdmin } from '../../context/AdminContext';
+import { useGetAdmissionsQuery, useUpdateAdmissionStatusMutation } from '../../store/api/admissionsApi';
 
 const AdmissionsPage = () => {
-    const loadAdmissions = () => getItems(STORAGE_KEYS.ADMISSIONS);
+    // RTK Query hooks
+    const { data: admissionsData, isLoading } = useGetAdmissionsQuery();
+    const [updateStatus] = useUpdateAdmissionStatusMutation();
 
-    const [admissions, setAdmissions] = useState(loadAdmissions());
+    // Map API data to table structure
+    const admissions = useMemo(() => {
+        if (!admissionsData?.success) return [];
+        return admissionsData.data.map(app => ({
+            id: app.applicationId || app._id,
+            _id: app._id,
+            name: app.fullName,
+            fatherName: app.fatherName,
+            course: app.program?.desiredCourse || 'N/A',
+            previousMarks: app.academic?.gpa || 'N/A',
+            email: app.email,
+            phone: app.phone,
+            appliedDate: new Date(app.submittedAt).toLocaleDateString(),
+            status: app.status.charAt(0).toUpperCase() + app.status.slice(1),
+            fullDetails: app
+        }));
+    }, [admissionsData]);
+
     const [actionDialog, setActionDialog] = useState({ isOpen: false, admission: null, action: null });
     const { showNotification } = useAdmin();
 
@@ -16,8 +35,6 @@ const AdmissionsPage = () => {
     const [searchFilter, setSearchFilter] = useState('');
     const [courseFilter, setCourseFilter] = useState('');
     const [statusFilter, setStatusFilter] = useState('');
-
-    const refresh = () => setAdmissions(loadAdmissions());
 
     // Unique values
     const uniqueCourses = useMemo(() => [...new Set(admissions.map(a => a.course).filter(Boolean))].sort(), [admissions]);
@@ -38,32 +55,23 @@ const AdmissionsPage = () => {
     const handleApprove = (admission) => { setActionDialog({ isOpen: true, admission, action: 'approve' }); };
     const handleReject = (admission) => { setActionDialog({ isOpen: true, admission, action: 'reject' }); };
 
-    const confirmAction = () => {
+    const confirmAction = async () => {
         const { admission, action } = actionDialog;
         try {
-            if (action === 'approve') {
-                updateItem(STORAGE_KEYS.ADMISSIONS, admission.id, { status: 'Approved' });
-                const newStudent = {
-                    name: admission.name,
-                    rollNo: `PGC-${new Date().getFullYear()}-${String(Math.floor(Math.random() * 1000)).padStart(3, '0')}`,
-                    course: admission.course,
-                    semester: '1st Year',
-                    email: admission.email,
-                    phone: admission.phone,
-                    status: 'Active'
-                };
-                addItem(STORAGE_KEYS.STUDENTS, newStudent);
-                logActivity('Admission Approved', `Approved admission for ${admission.name}`);
-                showNotification('Admission approved and student created', 'success');
-            } else {
-                updateItem(STORAGE_KEYS.ADMISSIONS, admission.id, { status: 'Rejected' });
-                logActivity('Admission Rejected', `Rejected admission for ${admission.name}`);
-                showNotification('Admission rejected', 'success');
-            }
-            refresh();
+            const status = action === 'approve' ? 'Approved' : 'Rejected';
+
+            await updateStatus({ id: admission._id, status }).unwrap();
+
+            showNotification(
+                `Admission ${status.toLowerCase()}${status === 'Approved' ? ' and student created' : ''}`,
+                'success'
+            );
+
             setActionDialog({ isOpen: false, admission: null, action: null });
         } catch (error) {
-            showNotification('Failed to process admission', 'error');
+            console.error('Action failed:', error);
+            const errorMessage = error.data?.message || 'Failed to process admission';
+            showNotification(errorMessage, 'error');
         }
     };
 
@@ -155,7 +163,7 @@ const AdmissionsPage = () => {
             </div>
 
             {/* Table */}
-            <DataTable columns={columns} data={filteredAdmissions} compact={true} emptyMessage="No admission applications found" searchable={false} />
+            <DataTable columns={columns} data={filteredAdmissions} loading={isLoading} compact={true} emptyMessage="No admission applications found" searchable={false} />
 
             <ConfirmDialog
                 isOpen={actionDialog.isOpen}

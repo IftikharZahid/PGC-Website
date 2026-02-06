@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import RevealOnScroll from '../components/RevealOnScroll';
+import PageHero from '../components/PageHero';
 
 const ResearchOpportunities = () => {
   const [selectedType, setSelectedType] = useState('All');
@@ -71,25 +72,19 @@ const ResearchOpportunities = () => {
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="relative px-4 bg-secondary-700 text-white overflow-hidden h-[200px] md:h-[220px]">
-        <div className="absolute inset-0 bg-black/25"></div>
-        <div className="relative max-w-7xl mx-auto h-full flex items-center justify-center">
-          <div className="text-center animate-fade-in w-full py-4">
-            <div className="mb-4">
-              <Link to="/research" className="text-white/80 hover:text-white transition-colors inline-flex items-center text-sm">
-                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                </svg>
-                Back to Research
-              </Link>
-            </div>
-            <h1 className="text-2xl md:text-4xl font-bold mt-20">Research Opportunities</h1>
-            <p className="text-sm md:text-base text-white/90 max-w-2xl mx-auto">
-              Discover positions available for students and faculty to engage in meaningful research
-            </p>
-          </div>
+      <PageHero
+        title="Research Opportunities"
+        subtitle="Discover positions available for students and faculty to engage in meaningful research"
+      >
+        <div className="mb-4">
+          <Link to="/research" className="text-white/80 hover:text-white transition-colors inline-flex items-center text-sm">
+            <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+            Back to Research
+          </Link>
         </div>
-      </section>
+      </PageHero>
 
       {/* Filter */}
       <section className="py-8 px-4 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 sticky top-16 z-40 shadow-sm">

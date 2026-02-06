@@ -20,7 +20,8 @@ const FeeForm = ({ fee, onClose }) => {
         paidAmount: 0,
         balance: '',
         status: 'unpaid',
-        dueDate: ''
+        dueDate: '',
+        feeMonth: ''
     });
 
     useEffect(() => {
@@ -63,7 +64,8 @@ const FeeForm = ({ fee, onClose }) => {
         if (fee) {
             setFormData({
                 ...fee,
-                dueDate: fee.dueDate ? fee.dueDate.split('T')[0] : ''
+                dueDate: fee.dueDate ? fee.dueDate.split('T')[0] : '',
+                feeMonth: fee.feeMonth || ''
             });
         }
     }, [fee]);
@@ -344,6 +346,31 @@ const FeeForm = ({ fee, onClose }) => {
                                     onChange={handleChange}
                                     className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-primary-500 outline-none"
                                 />
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">Fee Month *</label>
+                                <select
+                                    name="feeMonth"
+                                    value={formData.feeMonth}
+                                    onChange={handleChange}
+                                    required
+                                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-primary-500 outline-none"
+                                >
+                                    <option value="">Select Month</option>
+                                    <option value="January">January</option>
+                                    <option value="February">February</option>
+                                    <option value="March">March</option>
+                                    <option value="April">April</option>
+                                    <option value="May">May</option>
+                                    <option value="June">June</option>
+                                    <option value="July">July</option>
+                                    <option value="August">August</option>
+                                    <option value="September">September</option>
+                                    <option value="October">October</option>
+                                    <option value="November">November</option>
+                                    <option value="December">December</option>
+                                </select>
                             </div>
                         </div>
 

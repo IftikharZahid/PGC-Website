@@ -7,6 +7,7 @@ import rateLimit from 'express-rate-limit';
 import mongoSanitize from 'express-mongo-sanitize';
 import xss from 'xss-clean';
 import hpp from 'hpp';
+import compression from 'compression';
 import connectDB from './config/database.js';
 import coursesRouter from './routes/courses.js';
 import authRouter from './routes/auth.js';
@@ -19,6 +20,9 @@ import studentsRouter from './routes/students.js';
 import teachersRouter from './routes/teachers.js';
 import videoLecturesRouter from './routes/video-lectures.js';
 import attendanceRouter from './routes/attendance.js';
+import notificationsRouter from './routes/notifications.js';
+import admissionNotificationRouter from './routes/admissionNotification.js';
+import settingsRouter from './routes/settings.js';
 
 // Load environment variables
 dotenv.config();
@@ -36,7 +40,18 @@ connectDB().then(() => {
 });
 
 // Middleware
-app.use(cors());
+// CORS Configuration - Restrict origins in production
+const corsOptions = {
+  origin: process.env.NODE_ENV === 'production'
+    ? process.env.ALLOWED_ORIGINS?.split(',') || ['https://yourdomain.com']
+    : ['http://localhost:5173', 'http://localhost:3000', 'http://127.0.0.1:5173'],
+  credentials: true,
+  optionsSuccessStatus: 200
+};
+app.use(cors(corsOptions));
+
+// Compression - Reduces response size by ~70%
+app.use(compression());
 
 // Security Enhancements
 // 1. Set Security HTTP Headers
@@ -97,6 +112,9 @@ app.use('/api/students', studentsRouter);
 app.use('/api/teachers', teachersRouter);
 app.use('/api/video-lectures', videoLecturesRouter);
 app.use('/api/attendance', attendanceRouter);
+app.use('/api/notifications', notificationsRouter);
+app.use('/api/admission-notification', admissionNotificationRouter);
+app.use('/api/settings', settingsRouter);
 
 // Root endpoint
 app.get('/', (req, res) => {

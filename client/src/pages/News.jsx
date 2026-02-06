@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import PageHero from '../components/PageHero';
 
 const News = () => {
   const [news, setNews] = useState([]);
@@ -80,17 +81,10 @@ const News = () => {
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="relative px-4 bg-secondary-700 text-white overflow-hidden h-[180px] md:h-[200px]">
-        <div className="absolute inset-0 bg-black/25"></div>
-        <div className="relative max-w-7xl mx-auto h-full flex items-center justify-center">
-          <div className="text-center animate-fade-in w-full py-4">
-            <h1 className="text-2xl md:text-4xl font-bold mt-20">Latest News & Stories</h1>
-            <p className="text-sm md:text-base text-white/90 max-w-2xl mx-auto">
-              Stay updated with the latest happenings, achievements, and announcements from Punjab College.
-            </p>
-          </div>
-        </div>
-      </section>
+      <PageHero
+        title="Latest News & Stories"
+        subtitle="Stay updated with the latest happenings, achievements, and announcements from Punjab College."
+      />
 
       <div className="pt-8 pb-16 px-4 bg-gray-50 dark:bg-gray-900">
         <div className="max-w-7xl mx-auto">

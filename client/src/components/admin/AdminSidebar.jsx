@@ -13,11 +13,13 @@ import {
     ChevronRight,
     Bell,
     BellRing,
+    ClipboardList,
     Banknote,
     DollarSign,
     Video,
     Image as ImageIcon,
-    CalendarCheck
+    CalendarCheck,
+    Settings
 } from 'lucide-react';
 
 const AdminSidebar = ({ isOpen, onClose, isCollapsed, onToggleCollapse, sidebarWidth, setSidebarWidth }) => {
@@ -36,8 +38,15 @@ const AdminSidebar = ({ isOpen, onClose, isCollapsed, onToggleCollapse, sidebarW
         { path: '/admin/results', icon: FileText, label: 'Results' },
         { path: '/admin/admissions', icon: UserPlus, label: 'Admissions' },
         { path: '/admin/announcements', icon: Bell, label: 'Announcements' },
-        { path: '/admin/notification', icon: BellRing, label: 'Notification' },
-        { path: '/admin/video-lectures', icon: Video, label: 'Video Lectures' },
+        {
+            label: 'Notifications',
+            icon: BellRing,
+            isSubmenu: true,
+            items: [
+                { path: '/admin/notification', label: 'Homepage Notification' },
+                { path: '/admin/admission-notification', label: 'Admission Notification' }
+            ]
+        },
         {
             label: 'Gallery',
             icon: ImageIcon,
@@ -50,15 +59,20 @@ const AdminSidebar = ({ isOpen, onClose, isCollapsed, onToggleCollapse, sidebarW
                 { path: '/admin/gallery/seminars', label: 'Seminars' },
                 { path: '/admin/gallery/research', label: 'Research' }
             ]
-        }
+        },
+        { path: '/admin/video-lectures', icon: Video, label: 'Video Lectures' },
+        { path: '/admin/settings', icon: Settings, label: 'Settings' }
     ];
 
     const isActive = (path) => location.pathname === path;
 
     useEffect(() => {
-        const galleryItem = menuItems.find(item => item.isSubmenu);
-        if (galleryItem?.items.some(sub => location.pathname === sub.path)) {
-            setExpandedMenu('Gallery');
+        // Find which submenu contains the current path and expand only that one
+        const activeSubmenu = menuItems.find(item =>
+            item.isSubmenu && item.items.some(sub => location.pathname === sub.path)
+        );
+        if (activeSubmenu) {
+            setExpandedMenu(activeSubmenu.label);
         }
     }, [location.pathname]);
 
@@ -98,8 +112,13 @@ const AdminSidebar = ({ isOpen, onClose, isCollapsed, onToggleCollapse, sidebarW
                     </button>
                 </div>
 
-                {/* Navigation */}
-                <nav className="flex-1 overflow-y-auto py-2 px-2 space-y-0.5 custom-scrollbar">
+                {/* Navigation - Scrollable container */}
+                <nav className="flex-1 min-h-0 overflow-y-auto pt-2 pb-24 px-2 space-y-0.5 scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent hover:scrollbar-thumb-gray-400 dark:hover:scrollbar-thumb-gray-500"
+                    style={{
+                        scrollbarWidth: 'thin',
+                        scrollbarColor: 'rgba(156, 163, 175, 0.5) transparent'
+                    }}
+                >
                     {menuItems.map((item, index) => {
                         const Icon = item.icon;
 
@@ -114,8 +133,8 @@ const AdminSidebar = ({ isOpen, onClose, isCollapsed, onToggleCollapse, sidebarW
                                         onClick={() => setExpandedMenu(isExpanded ? null : item.label)}
                                         className={`w-full flex items-center ${isCollapsed ? 'justify-center' : 'justify-between'} px-2.5 py-2 rounded-lg transition-all text-xs
                                             ${isSubmenuActive
-                                                ? 'bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 font-semibold'
-                                                : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-gray-100'}
+                                                ? 'bg-red-500 text-white font-semibold shadow-md hover:bg-red-600 hover:text-white'
+                                                : 'text-gray-600 dark:text-gray-400 hover:bg-primary-600 dark:hover:bg-primary-600 hover:text-white dark:hover:text-white'}
                                         `}
                                         title={isCollapsed ? item.label : ''}
                                     >
@@ -137,8 +156,8 @@ const AdminSidebar = ({ isOpen, onClose, isCollapsed, onToggleCollapse, sidebarW
                                                     onClick={() => window.innerWidth < 1024 && onClose()}
                                                     className={`block px-2.5 py-1.5 text-[11px] rounded transition-colors
                                                         ${location.pathname === subItem.path
-                                                            ? 'text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 font-medium'
-                                                            : 'text-gray-500 dark:text-gray-500 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700'}
+                                                            ? 'text-white bg-red-500 font-medium shadow-sm hover:bg-red-600 hover:text-white'
+                                                            : 'text-gray-500 dark:text-gray-500 hover:bg-primary-600 dark:hover:bg-primary-600 hover:text-white dark:hover:text-white'}
                                                     `}
                                                 >
                                                     {subItem.label}
@@ -159,8 +178,8 @@ const AdminSidebar = ({ isOpen, onClose, isCollapsed, onToggleCollapse, sidebarW
                                 onClick={() => window.innerWidth < 1024 && onClose()}
                                 className={`flex items-center ${isCollapsed ? 'justify-center' : 'gap-2.5'} px-2.5 py-2 rounded-lg transition-all text-xs
                                     ${active
-                                        ? 'bg-red-500 text-white font-semibold shadow-md'
-                                        : 'text-gray-700 dark:text-gray-300 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-600 dark:hover:text-red-400 font-medium'}
+                                        ? 'bg-red-500 text-white font-semibold shadow-md hover:bg-red-600 hover:shadow-lg hover:scale-[1.02] active:scale-[0.98] active:brightness-95'
+                                        : 'text-gray-700 dark:text-gray-300 hover:bg-primary-600 dark:hover:bg-primary-600 hover:text-white dark:hover:text-white font-medium'}
                                 `}
                                 title={isCollapsed ? item.label : ''}
                             >

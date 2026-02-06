@@ -17,10 +17,18 @@ const Toast = ({ message, type = 'success', id }) => {
     };
 
     return (
-        <div className="fixed top-20 right-4 z-50 animate-fade-in">
-            <div className={`flex items-center gap-3 px-4 py-3 rounded-lg border shadow-lg ${styles[type]} min-w-[300px]`}>
-                {icons[type]}
-                <p className="font-medium flex-1">{message}</p>
+        <div className="fixed top-20 right-4 z-50 animate-slide-in-right">
+            <div className={`flex items-start gap-4 px-5 py-4 rounded-xl border shadow-xl backdrop-blur-sm ${styles[type]} min-w-[320px] max-w-[420px] transition-all transform hover:scale-[1.02]`}>
+                <div className="flex-shrink-0 mt-0.5">
+                    {icons[type]}
+                </div>
+                <div className="flex-1">
+                    <h4 className="text-sm font-bold uppercase tracking-wider opacity-80 mb-1">{type}</h4>
+                    <p className="text-sm font-medium leading-relaxed">{message}</p>
+                </div>
+                <button className="opacity-50 hover:opacity-100 transition-opacity">
+                    <XCircle className="w-4 h-4" />
+                </button>
             </div>
         </div>
     );

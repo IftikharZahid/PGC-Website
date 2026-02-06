@@ -28,75 +28,91 @@ const About = () => {
         subtitle="A legacy of excellence, a future of innovation."
       />
 
-      {/* Main Content */}
+      {/* Main Content - Compact & Professional */}
       <section className="py-10 px-4 bg-white dark:bg-gray-800">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid md:grid-cols-2 gap-12 items-center mb-20">
+        <div className="max-w-7xl mx-auto space-y-16">
+          {/* History & Mission */}
+          <div className="grid md:grid-cols-2 gap-8 items-start">
             <RevealOnScroll animation="animate-fade-right">
-              <img
-                src={getImg('about-campus', collegeBuilding)}
-                alt="College Campus"
-                className="w-full h-auto rounded-2xl shadow-xl"
-              />
+              <div className="relative">
+                <img
+                  src={getImg('about-campus', collegeBuilding)}
+                  alt="College Campus"
+                  className="w-full h-64 object-cover rounded-xl shadow-md"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent rounded-xl flex items-end p-6">
+                  <h3 className="text-white text-xl font-bold">A Legacy of Excellence</h3>
+                </div>
+              </div>
             </RevealOnScroll>
 
             <RevealOnScroll animation="animate-fade-left">
               <div>
-                <h2 className="text-3xl md:text-4xl font-bold mb-6 text-gray-900 dark:text-gray-100">
-                  Our History & Mission
+                <h2 className="text-2xl font-bold mb-3 text-gray-900 dark:text-gray-100 flex items-center gap-2">
+                  <span className="w-8 h-1 bg-primary-600 rounded-full"></span>
+                  History & Mission
                 </h2>
-                <p className="text-gray-600 dark:text-gray-300 leading-relaxed mb-6">
-                  Established with a vision to provide world-class education, Punjab College has grown into a premier institution known for academic excellence and character building. Our journey began with a handful of students and a commitment to quality. Today, we are proud to have a vast network of campuses across the country.
-                </p>
-                <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
-                  Our mission is to empower students with knowledge, skills, and values that enable them to succeed in their chosen fields and contribute positively to society. We believe in holistic development, fostering critical thinking, creativity, and leadership qualities in our students.
-                </p>
+                <div className="space-y-3 text-sm text-gray-600 dark:text-gray-300 leading-relaxed">
+                  <p>
+                    Established with a vision to provide world-class education, <strong className="text-primary-700 dark:text-primary-400">Punjab College</strong> has grown into a premier institution. From humble beginnings, we have expanded into a vast network, committed to academic excellence and character building.
+                  </p>
+                  <p>
+                    Our mission is to empower students with knowledge, skills, and values. We believe in holistic development, fostering critical thinking, creativity, and leadership to prepare students for a dynamic future.
+                  </p>
+                </div>
               </div>
             </RevealOnScroll>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-12 items-center">
-            <RevealOnScroll animation="animate-fade-right">
-              <div>
-                <h2 className="text-3xl md:text-4xl font-bold mb-6 text-gray-900 dark:text-gray-100">
-                  Principal's Message
-                </h2>
-                <blockquote className="text-lg italic text-gray-600 dark:text-gray-300 border-l-4 border-secondary-600 pl-4 mb-6">
-                  "Education is not just about acquiring degrees; it's about igniting the mind and shaping the character. At Punjab College, we strive to create an environment where every student can discover their potential and achieve their dreams."
-                </blockquote>
-                <p className="font-bold text-gray-900 dark:text-white">Principal/Director. Ahmad Raza Watto</p>
-                <p className="text-sm text-gray-500 dark:text-gray-400">Principal, Punjab College Fort Abbas</p>
-              </div>
-            </RevealOnScroll>
+          {/* Principal's Message & Core Values Grid */}
+          <div className="grid md:grid-cols-12 gap-8">
+            {/* Principal's Message - Compact Card */}
+            <div className="md:col-span-5">
+              <RevealOnScroll animation="animate-fade-right">
+                <div className="bg-gray-50 dark:bg-gray-900 border border-gray-100 dark:border-gray-700 rounded-xl p-6 relative overflow-hidden">
+                  <div className="absolute top-0 right-0 p-4 opacity-10">
+                    <svg className="w-24 h-24 text-primary-600" fill="currentColor" viewBox="0 0 24 24"><path d="M14.017 21L14.017 18C14.017 16.096 14.808 15.345 15.689 15.345C16.969 15.345 17.516 16.634 18.252 16.634C19.349 16.634 20.25 15.539 20.25 14.054C20.25 12.146 18.598 10.758 16.593 10.758C14.396 10.758 12.515 12.545 12.515 15.019C12.515 16.291 13.042 17.398 13.626 18.252L14.017 21ZM5.097 21L5.097 18C5.097 16.096 5.888 15.345 6.769 15.345C8.049 15.345 8.596 16.634 9.332 16.634C10.429 16.634 11.33 15.539 11.33 14.054C11.33 12.146 9.678 10.758 7.673 10.758C5.476 10.758 3.595 12.545 3.595 15.019C3.595 16.291 4.122 17.398 4.706 18.252L5.097 21Z" /></svg>
+                  </div>
 
-            <RevealOnScroll animation="animate-fade-left">
-              <img
-                src={getImg('about-principal', Principal)}
-                alt="Principal"
-                className="w-full max-w-md mx-auto h-auto rounded-2xl shadow-xl"
-              />
-            </RevealOnScroll>
-          </div>
-        </div>
-      </section>
+                  <div className="relative z-10 flex gap-4 items-start">
+                    <img
+                      src={getImg('about-principal', Principal)}
+                      alt="Principal"
+                      className="w-16 h-16 rounded-full object-cover border-2 border-primary-500 shadow-sm"
+                    />
+                    <div>
+                      <h3 className="text-lg font-bold text-gray-900 dark:text-white leading-tight">Principal's Message</h3>
+                      <p className="text-xs text-primary-600 dark:text-primary-400 font-bold mb-2">Ahmad Raza Watto</p>
+                      <blockquote className="text-xs text-gray-600 dark:text-gray-300 italic leading-relaxed">
+                        "Education is about igniting the mind and shaping character. We strive to create an environment where every student can discover their potential."
+                      </blockquote>
+                    </div>
+                  </div>
+                </div>
+              </RevealOnScroll>
+            </div>
 
-      {/* Vision & Values */}
-      <section className="py-10 px-4 bg-gray-50 dark:bg-gray-900">
-        <div className="max-w-7xl mx-auto">
-          <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 text-gray-900 dark:text-gray-100">
-            Our Core Values
-          </h2>
-          <div className="grid md:grid-cols-3 gap-8">
-            {[
-              { title: "Excellence", desc: "Striving for the highest standards in all endeavors." },
-              { title: "Integrity", desc: "Upholding honesty and ethical conduct." },
-              { title: "Innovation", desc: "Embracing new ideas and creative solutions." },
-            ].map((value, index) => (
-              <div key={index} className="bg-white dark:bg-gray-800 p-8 rounded-xl shadow-lg hover:-translate-y-2 transition-transform duration-300">
-                <h3 className="text-xl font-bold mb-4 text-secondary-700 dark:text-secondary-400">{value.title}</h3>
-                <p className="text-gray-600 dark:text-gray-300">{value.desc}</p>
-              </div>
-            ))}
+            {/* Core Values - Horizontal Grid */}
+            <div className="md:col-span-7">
+              <RevealOnScroll animation="animate-fade-left">
+                <div className="h-full flex flex-col justify-center">
+                  <h2 className="text-xl font-bold mb-4 text-gray-900 dark:text-gray-100">Our Core Values</h2>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    {[
+                      { title: "Excellence", icon: "⭐", desc: "Striving for highest standards." },
+                      { title: "Integrity", icon: "🛡️", desc: "Upholding honesty & ethics." },
+                      { title: "Innovation", icon: "💡", desc: "Embracing creative solutions." },
+                    ].map((value, index) => (
+                      <div key={index} className="bg-gray-50 dark:bg-gray-900 p-4 rounded-xl border border-gray-100 dark:border-gray-700 hover:border-primary-200 dark:hover:border-primary-800 transition-colors">
+                        <div className="text-2xl mb-2">{value.icon}</div>
+                        <h4 className="font-bold text-sm text-gray-900 dark:text-white mb-1">{value.title}</h4>
+                        <p className="text-[10px] text-gray-500 dark:text-gray-400 leading-tight">{value.desc}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </RevealOnScroll>
+            </div>
           </div>
         </div>
       </section>

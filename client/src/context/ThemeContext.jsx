@@ -72,9 +72,9 @@ export const ThemeProvider = ({ children }) => {
   // Hero style state: 'classic' (solid teal) or 'modern' (diagonal gradients)
   const [heroStyle, setHeroStyleState] = useState(() => {
     if (typeof window !== 'undefined') {
-      return localStorage.getItem('heroStyle') || 'modern';
+      return localStorage.getItem('heroStyle') || 'classic';
     }
-    return 'modern';
+    return 'classic';
   });
 
   // Color theme state

@@ -34,7 +34,7 @@ const AdminLogin = () => {
     // Check if user is already logged in
     if (user) {
         return (
-            <div className="min-h-screen relative bg-[#f2ebe3] dark:bg-gray-900 flex flex-col items-center justify-center overflow-hidden pt-16 pb-0">
+            <div className="min-h-screen relative bg-[#f2ebe3] dark:bg-gray-900 flex flex-col items-center justify-center overflow-hidden px-4 py-8 sm:pt-16 sm:pb-0">
                 {/* Animated SVG Background */}
                 {/* Animated SVG Background */}
                 <svg
@@ -82,19 +82,19 @@ const AdminLogin = () => {
                     </path>
                 </svg>
 
-                <div className="w-full max-w-md bg-white dark:bg-gray-800 rounded-xl shadow-2xl p-8 text-center relative z-10 animate-fade-in border border-white/50 backdrop-blur-sm">
-                    <div className="w-16 h-16 bg-yellow-100 dark:bg-yellow-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <svg className="w-8 h-8 text-yellow-600 dark:text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="w-full max-w-md bg-white dark:bg-gray-800 rounded-xl sm:rounded-2xl shadow-2xl p-5 sm:p-8 text-center relative z-10 animate-fade-in border border-white/50 backdrop-blur-sm">
+                    <div className="w-12 h-12 sm:w-16 sm:h-16 bg-yellow-100 dark:bg-yellow-900/30 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4">
+                        <svg className="w-6 h-6 sm:w-8 sm:h-8 text-yellow-600 dark:text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                         </svg>
                     </div>
-                    <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2 font-serif">Already Logged In</h2>
-                    <p className="text-gray-600 dark:text-gray-300 mb-6">
+                    <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-2 font-serif">Already Logged In</h2>
+                    <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300 mb-4 sm:mb-6">
                         You are currently logged in as <span className="font-semibold text-primary-700 dark:text-primary-400">{user.name}</span> ({user.role}).
                         <br />
                         Please logout first to access a different account.
                     </p>
-                    <div className="flex flex-col gap-3">
+                    <div className="flex flex-col gap-2 sm:gap-3">
                         <button
                             onClick={() => {
                                 const dashboardPath = user.role === 'student' ? '/student-dashboard' :
@@ -102,7 +102,7 @@ const AdminLogin = () => {
                                         '/admin-dashboard';
                                 navigate(dashboardPath);
                             }}
-                            className="w-full py-3 bg-primary-700 hover:bg-primary-800 text-white rounded-lg font-bold transition-colors shadow-md"
+                            className="w-full py-2.5 sm:py-3 bg-primary-700 hover:bg-primary-800 active:bg-primary-900 text-white rounded-lg font-bold transition-colors shadow-md text-sm sm:text-base"
                         >
                             Continue to Dashboard
                         </button>
@@ -111,7 +111,7 @@ const AdminLogin = () => {
                                 logout();
                                 setFormData({ email: '', password: '', rememberMe: false });
                             }}
-                            className="w-full py-3 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 rounded-lg font-bold hover:bg-red-100 dark:hover:bg-red-900/40 transition-colors"
+                            className="w-full py-2.5 sm:py-3 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 rounded-lg font-bold hover:bg-red-100 dark:hover:bg-red-900/40 active:bg-red-200 transition-colors text-sm sm:text-base"
                         >
                             Logout
                         </button>
@@ -137,22 +137,27 @@ const AdminLogin = () => {
         setLoading(true);
 
         try {
-            // Hardcoded admin credentials
-            const ADMIN_EMAIL = 'IftikharZahid@outlook.com';
-            const ADMIN_PASSWORD = 'Zikki786';
-
             let userData = null;
 
             // Validate credentials
             if (activeTab === 'admin') {
-                if (formData.email !== ADMIN_EMAIL || formData.password !== ADMIN_PASSWORD) {
-                    throw new Error('Invalid admin credentials');
+                // Admin Login via API (credentials stored in database)
+                const response = await fetch('/api/settings/admin/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        email: formData.email,
+                        password: formData.password
+                    })
+                });
+
+                const result = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(result.message || 'Invalid admin credentials');
                 }
-                userData = {
-                    email: formData.email,
-                    name: 'College Administrator',
-                    role: 'admin'
-                };
+
+                userData = result.data;
             } else {
                 // Teacher Login via API
                 const response = await fetch('/api/auth/teacher-login', {
@@ -243,7 +248,7 @@ const AdminLogin = () => {
     };
 
     return (
-        <div className="min-h-screen relative bg-[#f2ebe3] dark:bg-gray-900 flex flex-col items-center justify-center overflow-hidden">
+        <div className="min-h-screen relative bg-[#f2ebe3] dark:bg-gray-900 flex flex-col items-center justify-center overflow-hidden px-4 py-6 sm:py-0">
             {/* Animated SVG Background */}
             <svg
                 viewBox="0 0 1600 900"
@@ -290,7 +295,7 @@ const AdminLogin = () => {
                 </path>
             </svg>
 
-            <div className="relative z-10 w-full max-w-6xl px-4 sm:px-6 lg:px-8 flex flex-col lg:flex-row items-center justify-between gap-8 lg:gap-0 h-full mt-8 lg:mt-16">
+            <div className="relative z-10 w-full max-w-6xl px-0 sm:px-6 lg:px-8 flex flex-col lg:flex-row items-center justify-between gap-6 lg:gap-0 h-full mt-4 sm:mt-8 lg:mt-16">
                 {/* LEFT SECTION: Quote & Education Illustrator */}
                 <div className="lg:w-1/2 hidden lg:block relative">
                     <div className="absolute top-0 left-0 -translate-x-10 -translate-y-10 w-40 h-40 bg-yellow-400/20 rounded-full blur-3xl rounded-bl-none z-0"></div>
@@ -321,50 +326,50 @@ const AdminLogin = () => {
                 <div className="w-full lg:w-auto flex flex-col items-center">
                     {/* Main Card */}
                     {/* Main Card */}
-                    <div className="bg-white dark:bg-gray-800 w-full max-w-md rounded-[2rem] shadow-2xl p-6 my-4 border border-white/50 backdrop-blur-sm relative z-20">
+                    <div className="bg-white dark:bg-gray-800 w-full max-w-[calc(100vw-2rem)] sm:max-w-md rounded-2xl sm:rounded-[2rem] shadow-2xl p-4 sm:p-6 my-2 sm:my-4 border border-white/50 backdrop-blur-sm relative z-20">
                         {/* Header Section */}
-                        <div className="text-center bg-white dark:bg-gray-800 mb-4">
-                            <img src={logo} alt="Punjab College Logo" className="h-16 mx-auto mb-3 object-contain" />
-                            <h1 className="text-xl font-serif font-bold text-secondary-900 dark:text-white mb-1 tracking-wide">Welcome to the Portal</h1>
-                            <h2 className="text-gray-500 text-[11px] font-medium uppercase tracking-wider">Please sign in to access your dashboard</h2>
+                        <div className="text-center bg-white dark:bg-gray-800 mb-3 sm:mb-4">
+                            <img src={logo} alt="Punjab College Logo" className="h-12 sm:h-16 mx-auto mb-2 sm:mb-3 object-contain" />
+                            <h1 className="text-lg sm:text-xl font-serif font-bold text-secondary-900 dark:text-white mb-0.5 sm:mb-1 tracking-wide">Welcome to the Portal</h1>
+                            <h2 className="text-gray-500 text-[10px] sm:text-[11px] font-medium uppercase tracking-wider">Please sign in to access your dashboard</h2>
                         </div>
 
                         {/* Tabs */}
-                        <div className="flex border-b border-gray-100 dark:border-gray-700 mx-0 mb-4 bg-gray-50/50 dark:bg-gray-700/50 rounded-t-lg overflow-hidden">
+                        <div className="flex border-b border-gray-100 dark:border-gray-700 mx-0 mb-3 sm:mb-4 bg-gray-50/50 dark:bg-gray-700/50 rounded-t-lg overflow-hidden">
                             <button
-                                className={`flex-1 py-3 flex items-center justify-center gap-2 text-xs font-bold transition-all border-b-2 ${activeTab === 'admin'
+                                className={`flex-1 py-2.5 sm:py-3 flex items-center justify-center gap-1.5 sm:gap-2 text-[10px] sm:text-xs font-bold transition-all border-b-2 ${activeTab === 'admin'
                                     ? 'text-primary-700 border-primary-700 bg-white dark:bg-gray-800 shadow-sm'
                                     : 'text-gray-500 border-transparent hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
                                     }`}
                                 onClick={() => handleTabChange('admin')}
                             >
-                                <Building2 className={`w-4 h-4 ${activeTab === 'admin' ? 'text-primary-700' : 'text-gray-400'}`} />
+                                <Building2 className={`w-3.5 h-3.5 sm:w-4 sm:h-4 ${activeTab === 'admin' ? 'text-primary-700' : 'text-gray-400'}`} />
                                 Admin Login
                             </button>
                             <button
-                                className={`flex-1 py-3 flex items-center justify-center gap-2 text-xs font-bold transition-all border-b-2 ${activeTab === 'teacher'
+                                className={`flex-1 py-2.5 sm:py-3 flex items-center justify-center gap-1.5 sm:gap-2 text-[10px] sm:text-xs font-bold transition-all border-b-2 ${activeTab === 'teacher'
                                     ? 'text-primary-700 border-primary-700 bg-white dark:bg-gray-800 shadow-sm'
                                     : 'text-gray-500 border-transparent hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
                                     }`}
                                 onClick={() => handleTabChange('teacher')}
                             >
-                                <UserCircle className={`w-4 h-4 ${activeTab === 'teacher' ? 'text-primary-700' : 'text-gray-400'}`} />
+                                <UserCircle className={`w-3.5 h-3.5 sm:w-4 sm:h-4 ${activeTab === 'teacher' ? 'text-primary-700' : 'text-gray-400'}`} />
                                 Teacher Login
                             </button>
                         </div>
 
                         {/* Form Section */}
-                        <div className="pb-2">
+                        <div className="pb-1 sm:pb-2">
                             {error && (
-                                <div className="mb-4 p-2.5 bg-red-50 dark:bg-red-900/20 border border-red-100 dark:border-red-800/30 rounded-lg flex items-center gap-2 text-red-700 dark:text-red-300 text-xs">
-                                    <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+                                <div className="mb-3 sm:mb-4 p-2 sm:p-2.5 bg-red-50 dark:bg-red-900/20 border border-red-100 dark:border-red-800/30 rounded-lg flex items-center gap-2 text-red-700 dark:text-red-300 text-[11px] sm:text-xs">
+                                    <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
                                     {error}
                                 </div>
                             )}
 
-                            <form onSubmit={handleSubmit} className="space-y-4">
+                            <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4">
                                 <div>
-                                    <label className="block text-xs font-bold text-gray-800 dark:text-gray-200 mb-1">
+                                    <label className="block text-[11px] sm:text-xs font-bold text-gray-800 dark:text-gray-200 mb-1">
                                         {activeTab === 'admin' ? 'Admin Email' : 'Teacher Email'}
                                     </label>
                                     <input
@@ -372,14 +377,14 @@ const AdminLogin = () => {
                                         name="email"
                                         value={formData.email}
                                         onChange={handleChange}
-                                        className="w-full px-3 py-2.5 text-sm border border-gray-200 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-700 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all"
+                                        className="w-full px-3 py-2 sm:py-2.5 text-sm border border-gray-200 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-700 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all"
                                         placeholder={activeTab === 'admin' ? 'admin@pgc.edu.pk' : 'teacher@pgc.edu.pk'}
                                         required
                                     />
                                 </div>
 
                                 <div>
-                                    <label className="block text-xs font-bold text-gray-800 dark:text-gray-200 mb-1">
+                                    <label className="block text-[11px] sm:text-xs font-bold text-gray-800 dark:text-gray-200 mb-1">
                                         Password
                                     </label>
                                     <div className="relative">
@@ -388,46 +393,46 @@ const AdminLogin = () => {
                                             name="password"
                                             value={formData.password}
                                             onChange={handleChange}
-                                            className="w-full px-3 py-2.5 text-sm border border-gray-200 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-700 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all pr-10"
+                                            className="w-full px-3 py-2 sm:py-2.5 text-sm border border-gray-200 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-700 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all pr-10"
                                             placeholder="••••••••"
                                             required
                                         />
                                         <button
                                             type="button"
                                             onClick={() => setShowPassword(!showPassword)}
-                                            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 focus:outline-none"
+                                            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 focus:outline-none p-1"
                                         >
                                             {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                                         </button>
                                     </div>
                                 </div>
 
-                                <div className="flex items-center justify-between pt-1">
-                                    <label className="flex items-center gap-2 cursor-pointer group">
+                                <div className="flex items-center justify-between pt-0.5 sm:pt-1">
+                                    <label className="flex items-center gap-1.5 sm:gap-2 cursor-pointer group">
                                         <div className="relative flex items-center">
                                             <input
                                                 type="checkbox"
                                                 name="rememberMe"
                                                 checked={formData.rememberMe}
                                                 onChange={handleChange}
-                                                className="peer h-4 w-4 cursor-pointer appearance-none rounded border border-gray-300 shadow-sm transition-all checked:border-primary-600 checked:bg-primary-600 hover:border-primary-600"
+                                                className="peer h-3.5 w-3.5 sm:h-4 sm:w-4 cursor-pointer appearance-none rounded border border-gray-300 shadow-sm transition-all checked:border-primary-600 checked:bg-primary-600 hover:border-primary-600"
                                             />
-                                            <svg className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-3 h-3 pointer-events-none opacity-0 peer-checked:opacity-100 text-white transition-opacity" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round">
+                                            <svg className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-2.5 h-2.5 sm:w-3 sm:h-3 pointer-events-none opacity-0 peer-checked:opacity-100 text-white transition-opacity" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round">
                                                 <polyline points="20 6 9 17 4 12"></polyline>
                                             </svg>
                                         </div>
-                                        <span className="text-xs text-gray-600 dark:text-gray-400 group-hover:text-gray-800 dark:group-hover:text-gray-200">Remember me</span>
+                                        <span className="text-[10px] sm:text-xs text-gray-600 dark:text-gray-400 group-hover:text-gray-800 dark:group-hover:text-gray-200">Remember me</span>
                                     </label>
                                 </div>
 
                                 <button
                                     type="submit"
                                     disabled={loading}
-                                    className="w-full py-2.5 bg-primary-700 hover:bg-primary-800 text-white font-bold rounded-lg shadow-md shadow-primary-700/20 transition-all transform active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed uppercase tracking-wide text-xs mt-2"
+                                    className="w-full py-2 sm:py-2.5 bg-primary-700 hover:bg-primary-800 active:bg-primary-900 text-white font-bold rounded-lg shadow-md shadow-primary-700/20 transition-all transform active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed uppercase tracking-wide text-[11px] sm:text-xs mt-1 sm:mt-2"
                                 >
                                     {loading ? (
                                         <div className="flex items-center justify-center gap-2">
-                                            <svg className="animate-spin h-4 w-4 text-white" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                                            <svg className="animate-spin h-3.5 w-3.5 sm:h-4 sm:w-4 text-white" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
                                             <span>Signing In...</span>
                                         </div>
                                     ) : (
@@ -437,14 +442,14 @@ const AdminLogin = () => {
 
                             </form>
                             {/* Footer Help Text */}
-                            <div className="mt-4 text-center space-y-2">
-                                <div className="relative flex py-1 items-center">
+                            <div className="mt-3 sm:mt-4 text-center space-y-1.5 sm:space-y-2">
+                                <div className="relative flex py-0.5 sm:py-1 items-center">
                                     <div className="flex-grow border-t border-gray-200 dark:border-gray-600"></div>
-                                    <span className="flex-shrink-0 mx-3 text-gray-400 dark:text-gray-500 text-[10px] uppercase font-bold tracking-wider">Support</span>
+                                    <span className="flex-shrink-0 mx-2 sm:mx-3 text-gray-400 dark:text-gray-500 text-[9px] sm:text-[10px] uppercase font-bold tracking-wider">Support</span>
                                     <div className="flex-grow border-t border-gray-200 dark:border-gray-600"></div>
                                 </div>
-                                <a href="mailto:IftikharXahid@gmail.com" className="inline-flex items-center gap-2 px-3 py-1.5 bg-gray-50 hover:bg-gray-100 border border-gray-200 rounded-md text-primary-700 text-[11px] font-bold transition-colors">
-                                    <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span>
+                                <a href="mailto:IftikharXahid@gmail.com" className="inline-flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1 sm:py-1.5 bg-gray-50 hover:bg-gray-100 active:bg-gray-200 border border-gray-200 rounded-md text-primary-700 text-[10px] sm:text-[11px] font-bold transition-colors">
+                                    <span className="w-1 h-1 sm:w-1.5 sm:h-1.5 rounded-full bg-green-500 animate-pulse"></span>
                                     Contact IT Services
                                 </a>
                             </div>

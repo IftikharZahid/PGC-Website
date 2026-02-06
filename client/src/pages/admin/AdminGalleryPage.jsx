@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { getItems, updateItem, STORAGE_KEYS, initializeDemoData } from '../../utils/adminStorage';
-import { Save, RefreshCw, Image as ImageIcon, Users } from 'lucide-react';
+import { Save, RefreshCw, Image as ImageIcon, Users, ExternalLink, Check } from 'lucide-react';
 
 const AdminGalleryPage = ({ section = 'Home' }) => {
     const [images, setImages] = useState([]);
     const [teachers, setTeachers] = useState([]);
     const [loading, setLoading] = useState(true);
     const [successMsg, setSuccessMsg] = useState('');
+    const [savingId, setSavingId] = useState(null);
 
     // activeTab is now derived from props
     const activeTab = section;
@@ -19,6 +20,7 @@ const AdminGalleryPage = ({ section = 'Home' }) => {
     }, [activeTab]);
 
     const loadData = () => {
+        setLoading(true);
         if (isFacultySection) {
             // For Faculty section, load teachers instead of gallery images
             const teacherItems = getItems(STORAGE_KEYS.TEACHERS);
@@ -44,12 +46,16 @@ const AdminGalleryPage = ({ section = 'Home' }) => {
         }
     };
 
-    const handleSave = (id) => {
+    const handleSave = async (id) => {
+        setSavingId(id);
+        // Simulate network delay for better UX
+        await new Promise(resolve => setTimeout(resolve, 500));
+
         if (isFacultySection) {
             const teacher = teachers.find(t => t.id === id);
             if (teacher) {
                 updateItem(STORAGE_KEYS.TEACHERS, id, { image: teacher.image });
-                showSuccess(`Updated ${teacher.name}'s photo`);
+                showSuccess(`Updated ${teacher.name}`);
             }
         } else {
             const image = images.find(img => img.id === id);
@@ -58,6 +64,7 @@ const AdminGalleryPage = ({ section = 'Home' }) => {
                 showSuccess(`Updated ${image.title}`);
             }
         }
+        setSavingId(null);
     };
 
     const showSuccess = (msg) => {
@@ -67,12 +74,12 @@ const AdminGalleryPage = ({ section = 'Home' }) => {
 
     const getSectionColor = (section) => {
         switch (section) {
-            case 'Hero': return 'bg-blue-100 text-blue-800';
-            case 'Intro': return 'bg-purple-100 text-purple-800';
-            case 'News': return 'bg-green-100 text-green-800';
-            case 'Faculty': return 'bg-emerald-100 text-emerald-800';
-            case 'Seminars': return 'bg-orange-100 text-orange-800';
-            default: return 'bg-gray-100 text-gray-800';
+            case 'Hero': return 'bg-blue-50 text-blue-700 border-blue-200';
+            case 'Intro': return 'bg-purple-50 text-purple-700 border-purple-200';
+            case 'News': return 'bg-green-50 text-green-700 border-green-200';
+            case 'Faculty': return 'bg-emerald-50 text-emerald-700 border-emerald-200';
+            case 'Seminars': return 'bg-orange-50 text-orange-700 border-orange-200';
+            default: return 'bg-gray-50 text-gray-700 border-gray-200';
         }
     };
 
@@ -82,208 +89,151 @@ const AdminGalleryPage = ({ section = 'Home' }) => {
             : 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400';
     };
 
-    // Render Faculty/Teachers view
-    if (isFacultySection) {
+    if (loading) {
         return (
-            <div className="space-y-2">
-                {/* Header */}
-                <div className="flex justify-between items-center bg-white dark:bg-gray-800 p-3 rounded-lg shadow-sm mb-2">
-                    <div>
-                        <h1 className="text-xl font-bold text-gray-800 dark:text-gray-100 flex items-center gap-2">
-                            <Users className="w-5 h-5 text-primary-600" />
-                            Faculty Gallery
-                        </h1>
-                        <p className="text-gray-500 dark:text-gray-400 text-sm">
-                            Manage faculty photos • {teachers.length} teachers
-                        </p>
-                    </div>
-                    <button
-                        onClick={loadData}
-                        className="p-1.5 text-gray-500 hover:text-primary-600 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full transition-all"
-                        title="Refresh List"
-                    >
-                        <RefreshCw size={18} />
-                    </button>
-                </div>
-
-                {/* Success Message */}
-                {successMsg && (
-                    <div className="bg-green-50 border-l-4 border-green-500 p-3 rounded-md shadow-sm animate-fade-in">
-                        <div className="flex items-center">
-                            <svg className="h-5 w-5 text-green-400" viewBox="0 0 20 20" fill="currentColor">
-                                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                            </svg>
-                            <p className="ml-3 text-sm text-green-700">{successMsg}</p>
-                        </div>
-                    </div>
-                )}
-
-                {/* Teachers Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
-                    {teachers.map((teacher) => (
-                        <div key={teacher.id} className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden hover:shadow-md transition-shadow">
-                            {/* Preview Area */}
-                            <div className="aspect-square w-full bg-gray-100 dark:bg-gray-700 relative group overflow-hidden border-b border-gray-100 dark:border-gray-700">
-                                {teacher.image ? (
-                                    <img
-                                        src={teacher.image}
-                                        alt={teacher.name}
-                                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                                        onError={(e) => {
-                                            e.target.onerror = null;
-                                            e.target.src = 'https://via.placeholder.com/300x300?text=No+Photo';
-                                        }}
-                                    />
-                                ) : (
-                                    <div className="w-full h-full flex flex-col items-center justify-center text-gray-400">
-                                        <ImageIcon size={40} />
-                                        <span className="text-sm mt-2">No Photo</span>
-                                    </div>
-                                )}
-
-                                {/* Status Badge */}
-                                <div className="absolute top-2 right-2">
-                                    <span className={`px-2 py-0.5 rounded-full text-xs font-bold ${getStatusColor(teacher.status)}`}>
-                                        {teacher.status}
-                                    </span>
-                                </div>
-
-                                {/* Department Badge */}
-                                <div className="absolute top-2 left-2">
-                                    <span className="px-2 py-0.5 rounded-full text-xs font-bold bg-primary-100 text-primary-800 dark:bg-primary-900/30 dark:text-primary-400">
-                                        {teacher.department}
-                                    </span>
-                                </div>
-                            </div>
-
-                            {/* Info Area */}
-                            <div className="p-3 space-y-2">
-                                <div>
-                                    <h3 className="font-semibold text-gray-900 dark:text-gray-100 text-sm">{teacher.name}</h3>
-                                    <p className="text-xs text-gray-500 dark:text-gray-400">{teacher.designation}</p>
-                                </div>
-
-                                <div className="space-y-1.5">
-                                    <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Photo URL</label>
-                                    <input
-                                        type="text"
-                                        value={teacher.image || ''}
-                                        onChange={(e) => handleUrlChange(teacher.id, e.target.value)}
-                                        placeholder="Enter image URL..."
-                                        className="w-full px-2 py-1.5 text-xs border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-all bg-gray-50 dark:bg-gray-700 focus:bg-white dark:focus:bg-gray-600 dark:text-gray-100"
-                                    />
-                                </div>
-
-                                <button
-                                    onClick={() => handleSave(teacher.id)}
-                                    className="w-full flex items-center justify-center gap-1.5 bg-primary-600 hover:bg-primary-700 text-white px-3 py-1.5 rounded-lg text-xs font-medium transition-all active:scale-[0.98]"
-                                >
-                                    <Save size={14} />
-                                    Save Photo
-                                </button>
-                            </div>
-                        </div>
-                    ))}
-                </div>
+            <div className="flex items-center justify-center py-12">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
             </div>
         );
     }
 
-    // Render regular Gallery view (non-Faculty sections)
+    // Unified Render for both Faculty and Gallery
+    const displayItems = isFacultySection ? teachers : images.filter(img => img.section === activeTab);
+    const isEmpty = displayItems.length === 0;
+
     return (
-        <div className="space-y-2">
+        <div className="space-y-4">
             {/* Header Actions */}
-            <div className="flex justify-between items-center bg-white dark:bg-gray-800 p-3 rounded-lg shadow-sm mb-2">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
-                    <h1 className="text-xl font-bold text-gray-800 dark:text-gray-100">{activeTab} Gallery</h1>
-                    <p className="text-gray-500 dark:text-gray-400 text-sm">Manage gallery images for {activeTab.toLowerCase()} section</p>
+                    <h1 className="text-xl font-bold text-gray-900 dark:text-gray-100 flex items-center gap-2">
+                        {isFacultySection ? <Users className="w-5 h-5 text-primary-600" /> : <ImageIcon className="w-5 h-5 text-primary-600" />}
+                        {activeTab} Gallery
+                    </h1>
+                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                        Manage {isFacultySection ? 'faculty photos' : 'gallery images'} • {displayItems.length} items
+                    </p>
                 </div>
-                <button
-                    onClick={loadData}
-                    className="p-1.5 text-gray-500 hover:text-primary-600 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full transition-all"
-                    title="Refresh List"
-                >
-                    <RefreshCw size={18} />
-                </button>
+                <div className="flex gap-2">
+                    <button
+                        onClick={loadData}
+                        className="p-2 text-gray-500 hover:text-primary-600 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-all"
+                        title="Refresh"
+                    >
+                        <RefreshCw className="w-4 h-4" />
+                    </button>
+                </div>
             </div>
 
-            {/* Success Message */}
+            {/* Success Toast */}
             {successMsg && (
-                <div className="bg-green-50 border-l-4 border-green-500 p-3 rounded-md shadow-sm animate-fade-in">
-                    <div className="flex items-center">
-                        <svg className="h-5 w-5 text-green-400" viewBox="0 0 20 20" fill="currentColor">
-                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                        </svg>
-                        <p className="ml-3 text-sm text-green-700">{successMsg}</p>
-                    </div>
+                <div className="fixed bottom-4 right-4 bg-green-600 text-white px-4 py-2 rounded-lg shadow-lg flex items-center gap-2 animate-in slide-in-from-bottom-2 z-50">
+                    <Check className="w-4 h-4" />
+                    <span className="text-sm font-medium">{successMsg}</span>
                 </div>
             )}
 
-            {/* Images Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
-                {images.filter(img => img.section === activeTab).map((item) => (
-                    <div key={item.id} className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden hover:shadow-md transition-shadow">
-                        {/* Preview Area */}
-                        <div className="aspect-video w-full bg-gray-100 relative group overflow-hidden border-b border-gray-100">
-                            {item.url ? (
-                                <img
-                                    src={item.url}
-                                    alt={item.title}
-                                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                                    onError={(e) => {
-                                        e.target.onerror = null;
-                                        e.target.src = 'https://via.placeholder.com/400x225?text=Invalid+Image+URL';
-                                    }}
-                                />
-                            ) : (
-                                <div className="w-full h-full flex flex-col items-center justify-center text-gray-400">
-                                    <ImageIcon size={32} />
-                                    <span className="text-sm mt-2">No Image Set</span>
+            {/* Unified Grid */}
+            {isEmpty ? (
+                <div className="text-center py-12 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700">
+                    {isFacultySection ? (
+                        <Users className="w-12 h-12 mx-auto text-gray-400 mb-3" />
+                    ) : (
+                        <ImageIcon className="w-12 h-12 mx-auto text-gray-400 mb-3" />
+                    )}
+                    <p className="text-gray-500 dark:text-gray-400">No items found for this section.</p>
+                </div>
+            ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                    {displayItems.map((item) => (
+                        <div key={item.id} className="group bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden hover:shadow-md transition-all">
+                            <div className="flex p-3 gap-3">
+                                {/* Small Preview - Horizontal Layout for ALL items */}
+                                <div className="relative w-24 h-20 flex-shrink-0 bg-gray-100 dark:bg-gray-700 rounded-lg overflow-hidden border border-gray-100 dark:border-gray-600 group hover:border-primary-200 dark:hover:border-primary-700 transition-colors">
+                                    {(isFacultySection ? item.image : item.url) ? (
+                                        <img
+                                            src={isFacultySection ? item.image : item.url}
+                                            alt={isFacultySection ? item.name : item.title}
+                                            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                                            onError={(e) => {
+                                                e.target.onerror = null;
+                                                e.target.src = 'https://via.placeholder.com/150?text=No+Img';
+                                            }}
+                                        />
+                                    ) : (
+                                        <div className="w-full h-full flex items-center justify-center text-gray-400">
+                                            <ImageIcon className="w-8 h-8 opacity-50" />
+                                        </div>
+                                    )}
+
+                                    {/* Preview Overlay for Gallery items */}
+                                    {!isFacultySection && item.url && (
+                                        <a
+                                            href={item.url}
+                                            target="_blank"
+                                            rel="noreferrer"
+                                            className="absolute inset-0 bg-black/0 group-hover:bg-black/20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all text-white"
+                                        >
+                                            <ExternalLink className="w-4 h-4 drop-shadow-md" />
+                                        </a>
+                                    )}
                                 </div>
-                            )}
 
-                            {/* Section Badge */}
-                            <div className="absolute top-3 left-3">
-                                <span className={`px-2.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${getSectionColor(item.section)}`}>
-                                    {item.section}
-                                </span>
+                                {/* Info */}
+                                <div className="flex-1 min-w-0 flex flex-col justify-center">
+                                    {isFacultySection ? (
+                                        // Faculty Content
+                                        <>
+                                            <div className="flex items-start justify-between">
+                                                <h3 className="font-bold text-gray-900 dark:text-gray-100 text-sm truncate pr-2">{item.name}</h3>
+                                                <span className={`px-1.5 py-0.5 rounded-full text-[10px] font-bold flex-shrink-0 ${getStatusColor(item.status)}`}>
+                                                    {item.status}
+                                                </span>
+                                            </div>
+                                            <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{item.designation}</p>
+                                            <span className="inline-block mt-1 text-[10px] px-1.5 py-0.5 rounded bg-primary-50 text-primary-700 dark:bg-primary-900/30 dark:text-primary-300 w-fit truncate max-w-full">
+                                                {item.department}
+                                            </span>
+                                        </>
+                                    ) : (
+                                        // Gallery Content
+                                        <>
+                                            <div className="flex items-start justify-between">
+                                                <h3 className="font-bold text-gray-900 dark:text-gray-100 text-sm truncate pr-2" title={item.title}>{item.title}</h3>
+                                                <span className={`px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider border flex-shrink-0 ${getSectionColor(item.section)}`}>
+                                                    {item.section}
+                                                </span>
+                                            </div>
+                                            <p className="text-[10px] text-gray-400 font-mono mt-1 truncate">ID: {item.id}</p>
+                                        </>
+                                    )}
+                                </div>
                             </div>
-                        </div>
 
-                        {/* Edit Area */}
-                        <div className="p-3 space-y-3">
-                            <div>
-                                <h3 className="font-semibold text-gray-900 dark:text-gray-100 text-sm">{item.title}</h3>
-                                <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">ID: {item.id}</p>
-                            </div>
-
-                            <div className="space-y-2">
-                                <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Image Import Path / URL</label>
-                                <div className="flex gap-2">
+                            {/* Edit URL Input */}
+                            <div className="px-3 pb-3 pt-0">
+                                <div className="relative flex items-center">
                                     <input
                                         type="text"
-                                        value={item.url}
+                                        value={(isFacultySection ? item.image : item.url) || ''}
                                         onChange={(e) => handleUrlChange(item.id, e.target.value)}
-                                        placeholder="/src/assets/..."
-                                        className="flex-1 px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-all bg-gray-50 focus:bg-white"
+                                        placeholder="Image URL..."
+                                        className="w-full pl-2 pr-8 py-1.5 text-xs border border-gray-200 dark:border-gray-600 rounded bg-gray-50 dark:bg-gray-700/50 focus:bg-white dark:focus:bg-gray-700 focus:ring-1 focus:ring-primary-500 focus:border-primary-500 transition-colors"
                                     />
+                                    <button
+                                        onClick={() => handleSave(item.id)}
+                                        disabled={savingId === item.id}
+                                        className={`absolute right-1 p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors ${savingId === item.id ? 'text-primary-600 animate-pulse' : 'text-gray-400 hover:text-primary-600'}`}
+                                        title="Save URL"
+                                    >
+                                        {savingId === item.id ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />}
+                                    </button>
                                 </div>
-                                <p className="text-[10px] text-gray-400">
-                                    Use a public web URL (https://...) or a local path (/src/assets/...)
-                                </p>
                             </div>
-
-                            <button
-                                onClick={() => handleSave(item.id)}
-                                className="w-full flex items-center justify-center gap-2 bg-primary-600 hover:bg-primary-700 text-white px-4 py-2.5 rounded-lg text-sm font-medium transition-all active:scale-[0.98]"
-                            >
-                                <Save size={16} />
-                                Save Changes
-                            </button>
                         </div>
-                    </div>
-                ))}
-            </div>
+                    ))}
+                </div>
+            )}
         </div>
     );
 };

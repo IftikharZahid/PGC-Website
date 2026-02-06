@@ -12,6 +12,11 @@ const admissionSchema = new mongoose.Schema({
     required: true,
     trim: true
   },
+  fatherName: {
+    type: String,
+    required: false,
+    trim: true
+  },
   email: {
     type: String,
     required: true,
@@ -54,22 +59,22 @@ const admissionSchema = new mongoose.Schema({
     default: []
   },
   documents: {
-    profilePicture: { 
-      type: String, 
-      default: '' 
+    profilePicture: {
+      type: String,
+      default: ''
     },
-    matricResultCard: { 
-      type: String, 
-      required: true 
+    matricResultCard: {
+      type: String,
+      default: ''
     },
-    cnicPicture: { 
-      type: String, 
-      required: true 
+    cnicPicture: {
+      type: String,
+      default: ''
     }
   },
   status: {
     type: String,
-    enum: ['pending', 'under_review', 'accepted', 'rejected'],
+    enum: ['pending', 'under_review', 'approved', 'rejected'],
     default: 'pending'
   },
   submittedAt: {
@@ -80,7 +85,7 @@ const admissionSchema = new mongoose.Schema({
 
 // Auto-generate application ID before saving
 // Auto-generate application ID before saving
-admissionSchema.pre('save', async function() {
+admissionSchema.pre('save', async function () {
   if (this.isNew && !this.applicationId) {
     const year = new Date().getFullYear();
     const randomId = Math.floor(Math.random() * 100000).toString().padStart(5, '0');
@@ -89,7 +94,7 @@ admissionSchema.pre('save', async function() {
 });
 
 // Remove __v from JSON output
-admissionSchema.methods.toJSON = function() {
+admissionSchema.methods.toJSON = function () {
   const obj = this.toObject();
   delete obj.__v;
   return obj;

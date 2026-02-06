@@ -1,54 +1,28 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Plus, Edit2, Trash2 } from 'lucide-react';
 import DataTable from '../../components/admin/DataTable';
 import ConfirmDialog from '../../components/admin/ConfirmDialog';
 import TeacherForm from '../../components/admin/TeacherForm';
-import { getItems, deleteItem, updateItem, STORAGE_KEYS, logActivity, initializeDemoData } from '../../utils/adminStorage';
+import { logActivity } from '../../utils/adminStorage';
 import { useAdmin } from '../../context/AdminContext';
+import {
+    useGetTeachersQuery,
+    useDeleteTeacherMutation,
+    useUpdateTeacherMutation
+} from '../../store/api/teachersApi';
 
 const TeachersPage = () => {
-    const [teachers, setTeachers] = useState([]);
-    const [isLoading, setIsLoading] = useState(true);
+    // RTK Query hooks
+    const { data: teachersData, isLoading } = useGetTeachersQuery();
+    const [deleteTeacher] = useDeleteTeacherMutation();
+    const [updateTeacher] = useUpdateTeacherMutation();
+
+    const teachers = teachersData?.success ? teachersData.data.map(t => ({ ...t, id: t._id })) : [];
+
     const [showForm, setShowForm] = useState(false);
     const [editingTeacher, setEditingTeacher] = useState(null);
     const [deleteDialog, setDeleteDialog] = useState({ isOpen: false, teacher: null });
-    const [isMigrating, setIsMigrating] = useState(false);
     const { showNotification } = useAdmin();
-
-    useEffect(() => {
-        loadTeachers();
-
-        // Listen for updates
-        const handleRefresh = () => loadTeachers();
-        window.addEventListener('storage', handleRefresh);
-        window.addEventListener('focus', handleRefresh);
-
-        return () => {
-            window.removeEventListener('storage', handleRefresh);
-            window.removeEventListener('focus', handleRefresh);
-        };
-    }, []);
-
-    const loadTeachers = async () => {
-        setIsLoading(true);
-        try {
-            const response = await fetch('/api/teachers');
-            const data = await response.json();
-            if (data.success) {
-                const mapped = data.data.map(t => ({
-                    ...t,
-                    id: t._id // for DataTable
-                }));
-                setTeachers(mapped);
-            }
-        } catch (error) {
-            showNotification('Failed to load teachers', 'error');
-        } finally {
-            setIsLoading(false);
-        }
-    };
-
-    const refresh = () => loadTeachers();
 
     const handleEdit = (teacher) => {
         setEditingTeacher(teacher);
@@ -59,114 +33,31 @@ const TeachersPage = () => {
         setDeleteDialog({ isOpen: true, teacher });
     };
 
-    const migrateData = async () => {
-        if (!confirm('This will upload your local teachers to the database. Continue?')) return;
-
-        setIsMigrating(true);
-        try {
-            const localTeachers = getItems(STORAGE_KEYS.TEACHERS);
-            // Also try to get initial demo data if local is empty/sparse
-            let sourceData = localTeachers;
-
-            // Check if we need to supplement with demo data (from Faculty page source)
-            if (sourceData.length === 0) {
-                // Trigger demo data init if needed (this function is imported)
-                // Or we can manually construct the demo list here if we imported IT.
-                // Ideally we trust 'getItems' after a potential init.
-                // But user specifically asked for "faculty page" members.
-                // Those are initialized in adminStorage.js.
-            }
-
-            if (!sourceData || sourceData.length === 0) {
-                showNotification('No local data found to migrate', 'info');
-                return;
-            }
-
-            let successCount = 0;
-            let failCount = 0;
-
-            for (const teacher of sourceData) {
-                try {
-                    // Prepare data matching the schema
-                    const payload = {
-                        name: teacher.name,
-                        email: teacher.email,
-                        phone: teacher.phone,
-                        designation: teacher.designation,
-                        department: teacher.department,
-                        qualification: teacher.qualification,
-                        experience: teacher.experience,
-                        subjects: teacher.subjects,
-                        image: teacher.image,
-                        status: teacher.status || 'Active'
-                    };
-
-                    const response = await fetch('/api/teachers', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(payload)
-                    });
-
-                    if (response.ok || response.status === 409) { // 409 = exists
-                        successCount++;
-                    } else {
-                        failCount++;
-                        console.error('Failed to migrate', teacher.name);
-                    }
-                } catch (e) {
-                    failCount++;
-                    console.error('Migration error', e);
-                }
-            }
-
-            showNotification(`Migration: ${successCount} processed, ${failCount} failed`, 'success');
-            refresh();
-        } catch (error) {
-            showNotification('Migration failed critical error', 'error');
-        } finally {
-            setIsMigrating(false);
-        }
-    };
-
     const confirmDelete = async () => {
         try {
-            const response = await fetch(`/api/teachers/${deleteDialog.teacher.id}`, { method: 'DELETE' });
-            if (response.ok) {
-                logActivity('Teacher Deleted', `Deleted teacher: ${deleteDialog.teacher.name}`);
-                showNotification('Teacher deleted successfully', 'success');
-                refresh();
-                setDeleteDialog({ isOpen: false, teacher: null });
-            } else {
-                throw new Error('Failed to delete');
-            }
+            await deleteTeacher(deleteDialog.teacher.id).unwrap();
+            logActivity('Teacher Deleted', `Deleted teacher: ${deleteDialog.teacher.name}`);
+            showNotification('Teacher deleted successfully', 'success');
+            setDeleteDialog({ isOpen: false, teacher: null });
         } catch (error) {
-            showNotification('Failed to delete teacher', 'error');
+            showNotification(error.data?.message || 'Failed to delete teacher', 'error');
         }
     };
 
     const toggleStatus = async (teacher) => {
         const newStatus = teacher.status === 'Active' ? 'Inactive' : 'Active';
         try {
-            const response = await fetch(`/api/teachers/${teacher.id}`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ status: newStatus })
-            });
-
-            if (response.ok) {
-                showNotification(`Teacher ${newStatus === 'Active' ? 'activated' : 'deactivated'} successfully`, 'success');
-                logActivity('Teacher Status Changed', `Changed ${teacher.name} status to ${newStatus}`);
-                refresh();
-            }
+            await updateTeacher({ id: teacher.id, status: newStatus }).unwrap();
+            showNotification(`Teacher ${newStatus === 'Active' ? 'activated' : 'deactivated'} successfully`, 'success');
+            logActivity('Teacher Status Changed', `Changed ${teacher.name} status to ${newStatus}`);
         } catch (error) {
-            showNotification('Failed to update status', 'error');
+            showNotification(error.data?.message || 'Failed to update status', 'error');
         }
     };
 
     const closeForm = () => {
         setShowForm(false);
         setEditingTeacher(null);
-        loadTeachers();
     };
 
     const columns = [
@@ -252,13 +143,7 @@ const TeachersPage = () => {
                     <p className="text-gray-600 dark:text-gray-400 text-sm">Manage faculty and staff records</p>
                 </div>
                 <div className="flex gap-2">
-                    <button
-                        onClick={migrateData}
-                        disabled={isMigrating}
-                        className="px-3 py-1.5 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-semibold text-sm disabled:opacity-50"
-                    >
-                        {isMigrating ? 'Migrating...' : 'Migrate Local Data'}
-                    </button>
+
                     <button
                         onClick={() => setShowForm(true)}
                         className="flex items-center gap-2 px-3 py-1.5 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors font-semibold text-sm"
@@ -272,9 +157,10 @@ const TeachersPage = () => {
             {/* Data Table */}
             <DataTable
                 columns={columns}
-                data={teachers || []}
+                data={teachers}
                 loading={isLoading}
                 compact={true}
+                disablePagination={true}
                 searchPlaceholder="Search teachers by name, subject, email..."
                 emptyMessage="No teachers found. Add your first teacher!"
             />

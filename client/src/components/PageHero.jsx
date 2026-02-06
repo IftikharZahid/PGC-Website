@@ -12,12 +12,12 @@ const PageHero = ({ title, subtitle }) => {
     if (heroStyle === 'classic') {
         // Classic Style: Solid teal background with dark overlay
         return (
-            <section className="relative px-4 bg-secondary-700 text-white overflow-hidden h-[180px] md:h-[200px]">
-                <div className="absolute inset-0 bg-black/25"></div>
+            <section className="relative px-4 bg-secondary-700 dark:bg-gray-800 text-white overflow-hidden h-[180px] md:h-[200px]">
+                <div className="absolute inset-0 bg-black/25 dark:bg-black/40"></div>
                 <div className="relative max-w-7xl mx-auto h-full flex items-center justify-center">
                     <div className="text-center animate-fade-in w-full py-4">
-                        <h1 className="text-2xl md:text-4xl font-bold mt-20">{title}</h1>
-                        <p className="text-sm md:text-base text-white/90 max-w-2xl mx-auto">
+                        <h1 className="text-2xl md:text-4xl font-bold mt-20 text-white">{title}</h1>
+                        <p className="text-sm md:text-base text-white/90 dark:text-gray-300 max-w-2xl mx-auto">
                             {subtitle}
                         </p>
                     </div>
@@ -36,8 +36,8 @@ const PageHero = ({ title, subtitle }) => {
 
             <div className="relative max-w-7xl mx-auto h-full flex items-center justify-center z-10">
                 <div className="text-center animate-fade-in">
-                    <h1 className="text-2xl md:text-4xl font-bold font-serif text-gray-900 dark:text-white mt-14 drop-shadow-sm">{title}</h1>
-                    <p className="text-sm md:text-base text-gray-700 dark:text-gray-300 max-w-xl mx-auto mt-2">
+                    <h1 className="text-2xl md:text-4xl font-bold font-serif text-white mt-14 drop-shadow-sm">{title}</h1>
+                    <p className="text-sm md:text-base text-gray-100 dark:text-gray-300 max-w-xl mx-auto mt-2">
                         {subtitle}
                     </p>
                     <div className="h-1 w-16 bg-primary-600 rounded-full mx-auto mt-3"></div>

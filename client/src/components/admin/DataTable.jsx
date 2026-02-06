@@ -11,7 +11,9 @@ const DataTable = ({
     searchPlaceholder = 'Search...',
     emptyMessage = 'No data available',
     compact = false,
-    loading = false
+    loading = false,
+    disablePagination = false,
+    rowClassName = null
 }) => {
     const [searchQuery, setSearchQuery] = useState('');
     const [sortColumn, setSortColumn] = useState(null);
@@ -42,7 +44,7 @@ const DataTable = ({
 
     const totalPages = Math.ceil(sortedData.length / itemsPerPage);
     const startIndex = (currentPage - 1) * itemsPerPage;
-    const paginatedData = sortedData.slice(startIndex, startIndex + itemsPerPage);
+    const paginatedData = disablePagination ? sortedData : sortedData.slice(startIndex, startIndex + itemsPerPage);
 
     const handleSort = (columnKey) => {
         if (sortColumn === columnKey) {
@@ -184,7 +186,10 @@ const DataTable = ({
                             </tr>
                         ) : (
                             paginatedData.map((row, index) => (
-                                <tr key={row.id || index} className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+                                <tr
+                                    key={row.id || index}
+                                    className={`hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors ${rowClassName ? rowClassName(row) : ''}`}
+                                >
                                     <td className={`${compact ? 'px-2 py-1 text-xs' : 'px-2 py-2 text-sm'} text-center text-gray-600 dark:text-gray-400 font-medium w-12 border-r border-gray-100 dark:border-gray-700`}>
                                         {(currentPage - 1) * itemsPerPage + index + 1}
                                     </td>
@@ -241,7 +246,7 @@ const DataTable = ({
             </div>
 
             {/* Pagination - Compact */}
-            {totalPages > 1 && (
+            {!disablePagination && totalPages > 1 && (
                 <div className="flex items-center justify-between text-sm">
                     <p className="text-gray-700 dark:text-gray-300">
                         Showing {startIndex + 1}-{Math.min(startIndex + itemsPerPage, sortedData.length)} of {sortedData.length}

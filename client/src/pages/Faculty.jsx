@@ -63,198 +63,181 @@ const Faculty = () => {
         subtitle="Meeting the mentors shaping the future generation."
       />
 
-      {/* Filter Tabs */}
-      <section className="py-4 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 sticky top-14 z-40 shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 overflow-x-auto">
-          <div className="flex space-x-2 md:justify-center min-w-max">
+
+
+      {/* Filter Tabs - Sticky & Modern */}
+      <div className="sticky top-0 z-30 bg-white/80 dark:bg-gray-900/90 backdrop-blur-md border-b border-gray-200 dark:border-gray-700 py-3 shadow-sm">
+        <div className="max-w-7xl mx-auto px-4 overflow-x-auto hide-scrollbar">
+          <div className="flex space-x-2">
             {departments.map((dept) => (
               <button
                 key={dept}
                 onClick={() => setActiveTab(dept)}
-                className={`px-6 py-2 rounded-full text-sm font-semibold transition-all duration-300 ${activeTab === dept
-                  ? 'bg-primary-600 text-white shadow-lg scale-105'
-                  : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
-                  }`}
+                className={`
+                  px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wide whitespace-nowrap transition-all duration-200 border
+                  ${activeTab === dept
+                    ? 'bg-primary-600 border-primary-600 text-white shadow-md scale-105'
+                    : 'bg-transparent border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:border-primary-500 hover:text-primary-600 dark:hover:text-primary-400'
+                  }
+                `}
               >
                 {dept}
               </button>
             ))}
           </div>
         </div>
+      </div>
+
+      {/* Faculty Grid Section - Compact 4cols */}
+      <section className="py-8 px-4 bg-gray-50 dark:bg-gray-900 min-h-[60vh]">
+        <div className="max-w-7xl mx-auto">
+          {filteredFaculty.length === 0 ? (
+            <div className="text-center py-20">
+              <div className="text-gray-400 text-lg">No faculty members found in this department.</div>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+              {filteredFaculty.map((member, index) => (
+                <RevealOnScroll key={index} animation="animate-fade-up" delay={`${index * 0.05}s`}>
+                  <div
+                    onClick={() => setSelectedFaculty(member)}
+                    className="bg-white dark:bg-gray-800 rounded-xl shadow-sm hover:shadow-xl border border-gray-100 dark:border-gray-700 overflow-hidden group hover:-translate-y-1 transition-all duration-300 cursor-pointer h-full flex flex-col"
+                  >
+                    <div className="relative h-48 bg-gray-200 dark:bg-gray-700 overflow-hidden">
+                      {member.image ? (
+                        <img
+                          src={member.image}
+                          alt={member.name}
+                          className="w-full h-full object-cover object-top transition-transform duration-500 group-hover:scale-110"
+                          onError={(e) => {
+                            e.target.style.display = 'none';
+                            e.target.nextSibling.style.display = 'flex';
+                          }}
+                        />
+                      ) : null}
+                      <div
+                        className={`w-full h-full flex items-center justify-center bg-secondary-700 text-white text-4xl font-bold ${member.image ? 'hidden' : 'flex'}`}
+                      >
+                        {member.name.split(' ').slice(0, 2).map(n => n[0]).join('')}
+                      </div>
+                      {/* Quick View Overlay */}
+                      <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                        <span className="px-3 py-1 bg-white/20 backdrop-blur-md text-white text-xs font-bold rounded-full border border-white/30">
+                          View Profile
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="p-4 flex-1 flex flex-col">
+                      <div className="text-[10px] font-bold uppercase tracking-wider text-primary-600 dark:text-primary-400 mb-1">
+                        {member.department}
+                      </div>
+                      <h3 className="text-base font-bold text-gray-900 dark:text-white leading-tight mb-1 group-hover:text-primary-700 dark:group-hover:text-primary-400 transition-colors line-clamp-1">
+                        {member.name}
+                      </h3>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 font-medium mb-3 line-clamp-1">
+                        {member.designation}
+                      </p>
+
+                      <div className="mt-auto pt-3 border-t border-gray-50 dark:border-gray-700 flex items-center justify-between text-xs text-gray-400 dark:text-gray-500">
+                        <span className="truncate max-w-[60%]" title={member.qualification}>{member.qualification}</span>
+                        <span className="flex items-center gap-1 flex-shrink-0">
+                          <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                          {member.experience}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </RevealOnScroll>
+              ))}
+            </div>
+          )}
+        </div>
       </section>
 
-      {/* Faculty Grid Section */}
-      <section className="py-6 px-4 bg-gray-50 dark:bg-gray-900">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredFaculty.map((member, index) => (
-              <RevealOnScroll key={index} animation="animate-fade-up" delay={`${index * 0.1}s`}>
-                <div
-                  onClick={() => setSelectedFaculty(member)}
-                  className="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden group hover:-translate-y-2 transition-transform duration-300 cursor-pointer"
-                >
-                  <div className="relative h-56 bg-gray-200 dark:bg-gray-700 overflow-hidden">
-                    {member.image ? (
-                      <img
-                        src={member.image}
-                        alt={member.name}
-                        className="w-full h-full object-cover object-top transition-transform duration-500 group-hover:scale-110"
-                        onError={(e) => {
-                          e.target.style.display = 'none';
-                          e.target.nextSibling.style.display = 'flex';
-                        }}
-                      />
-                    ) : null}
-                    <div
-                      className={`w-full h-full flex items-center justify-center bg-secondary-700 text-white text-4xl font-bold ${member.image ? 'hidden' : 'flex'}`}
-                    >
-                      {member.name.split(' ').map(n => n[0]).join('').slice(0, 2)}
-                    </div>
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4">
-
-                    </div>
-                  </div>
-
-                  <div className="p-4">
-                    <div className="text-xs font-semibold text-secondary-700 dark:text-secondary-400 mb-1">
-                      {member.department}
-                    </div>
-                    <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-1">
-                      {member.name}
-                    </h3>
-                    <p className="text-gray-600 dark:text-gray-300 font-medium mb-3 text-sm">
-                      {member.designation}
-                    </p>
-
-                    <div className="border-t border-gray-100 dark:border-gray-700 pt-3 space-y-1.5">
-                      <div className="flex items-center text-sm text-gray-500 dark:text-gray-400">
-                        <svg className="w-4 h-4 mr-2 text-secondary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l9-5-9-5-9 5 9 5z" />
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" />
-                        </svg>
-                        {member.qualification}
-                      </div>
-                      <div className="flex items-center text-sm text-gray-500 dark:text-gray-400">
-                        <svg className="w-4 h-4 mr-2 text-secondary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                        Experience: {member.experience}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </RevealOnScroll>
-            ))}
-          </div>
-        </div>
-      </section >
-
-      {/* Faculty Details Modal */}
+      {/* Faculty Details Modal - Professional & Compact */}
       {
         selectedFaculty && (
           <div
-            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fade-in"
             onClick={() => setSelectedFaculty(null)}
           >
             <div
-              className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto"
+              className="bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-md overflow-hidden relative animate-scale-up"
               onClick={(e) => e.stopPropagation()}
             >
-              {/* Modal Header with Image */}
-              <div className="relative">
-                <div className="h-48 bg-secondary-700 relative overflow-hidden">
-                  <div className="absolute inset-0 bg-black/20"></div>
-                </div>
-                <div className="absolute top-24 left-1/2 transform -translate-x-1/2">
+              {/* Close Button (Absolute) */}
+              <button
+                onClick={() => setSelectedFaculty(null)}
+                className="absolute top-3 right-3 z-10 p-2 bg-black/20 hover:bg-black/40 text-white rounded-full transition-colors backdrop-blur-sm"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+
+              {/* Header Banner */}
+              <div className="h-32 bg-gradient-to-r from-secondary-800 to-secondary-600 relative">
+                <div className="absolute inset-0 opacity-20 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]"></div>
+              </div>
+
+              {/* Profile Image & Basic Info */}
+              <div className="px-6 relative flex flex-col items-center -mt-16">
+                <div className="relative">
                   {selectedFaculty.image ? (
                     <img
                       src={selectedFaculty.image}
                       alt={selectedFaculty.name}
-                      className="w-40 h-40 rounded-full border-4 border-white dark:border-gray-800 object-cover object-top shadow-xl"
+                      className="w-32 h-32 rounded-full border-4 border-white dark:border-gray-800 object-cover shadow-lg"
                     />
                   ) : (
-                    <div className="w-40 h-40 rounded-full border-4 border-white dark:border-gray-800 flex items-center justify-center bg-secondary-700 text-white text-5xl font-bold shadow-xl">
-                      {selectedFaculty.name.split(' ').map(n => n[0]).join('').slice(0, 2)}
+                    <div className="w-32 h-32 rounded-full border-4 border-white dark:border-gray-800 flex items-center justify-center bg-secondary-700 text-white text-4xl font-bold shadow-lg">
+                      {selectedFaculty.name.split(' ').slice(0, 2).map(n => n[0]).join('')}
                     </div>
                   )}
                 </div>
-                <button
-                  onClick={() => setSelectedFaculty(null)}
-                  className="absolute top-4 right-4 text-white hover:bg-white/20 rounded-full p-2 transition-colors"
-                >
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
-              </div>
 
-              {/* Modal Content */}
-              <div className="pt-24 pb-8 px-8">
-                {/* Name and Title */}
-                <div className="text-center mb-4">
-                  <div className="flex items-center justify-center gap-3 text-base mb-2">
-                    <span className="text-gray-600 dark:text-gray-300 font-medium">
-                      {selectedFaculty.designation}
-                    </span>
-                    <span className="text-gray-400">•</span>
-                    <span className="px-4 py-1 bg-secondary-100 dark:bg-secondary-900/30 text-secondary-700 dark:text-secondary-300 rounded-full font-semibold">
-                      {selectedFaculty.department}
-                    </span>
-                  </div>
-                  <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+                <div className="text-center mt-3 mb-6">
+                  <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-1">
                     {selectedFaculty.name}
                   </h2>
-                </div>
-
-                {/* Details Grid */}
-                <div className="grid md:grid-cols-2 gap-4 mb-4">
-                  {/* Qualification */}
-                  <div className="bg-gray-50 dark:bg-gray-700/50 rounded-xl p-4">
-                    <div className="flex items-start gap-4">
-                      <div className="bg-secondary-600 rounded-lg p-3">
-                        <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l9-5-9-5-9 5 9 5z" />
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" />
-                        </svg>
-                      </div>
-                      <div>
-                        <h3 className="text-sm font-semibold text-gray-500 dark:text-gray-400 mb-1">Qualification</h3>
-                        <p className="text-lg font-bold text-gray-900 dark:text-white">{selectedFaculty.qualification}</p>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Experience */}
-                  <div className="bg-gray-50 dark:bg-gray-700/50 rounded-xl p-4">
-                    <div className="flex items-start gap-4">
-                      <div className="bg-secondary-600 rounded-lg p-3">
-                        <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                      </div>
-                      <div>
-                        <h3 className="text-sm font-semibold text-gray-500 dark:text-gray-400 mb-1">Experience</h3>
-                        <p className="text-lg font-bold text-gray-900 dark:text-white">{selectedFaculty.experience}</p>
-                      </div>
-                    </div>
+                  <div className="flex items-center justify-center gap-2 text-sm text-gray-500 dark:text-gray-400">
+                    <span className="font-medium text-primary-600 dark:text-primary-400">{selectedFaculty.designation}</span>
+                    <span>•</span>
+                    <span>{selectedFaculty.department}</span>
                   </div>
                 </div>
 
-                {/* Close Button */}
-                <div className="text-center">
-                  <button
-                    onClick={() => setSelectedFaculty(null)}
-                    className="btn-primary bg-primary-600 text-white px-8 py-2 rounded-lg font-bold hover:bg-primary-700 transition-colors"
-                  >
-                    Close
-                  </button>
+                {/* Details List */}
+                <div className="w-full bg-gray-50 dark:bg-gray-700/30 rounded-lg p-4 mb-6 space-y-3">
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 flex items-center justify-center flex-shrink-0">
+                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l9-5-9-5-9 5 9 5z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" /></svg>
+                    </div>
+                    <div className="flex-1">
+                      <div className="text-xs text-gray-500 dark:text-gray-400 font-semibold uppercase">Qualification</div>
+                      <div className="text-sm font-bold text-gray-900 dark:text-white">{selectedFaculty.qualification}</div>
+                    </div>
+                  </div>
+
+                  <div className="h-px bg-gray-200 dark:bg-gray-700"></div>
+
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-full bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 flex items-center justify-center flex-shrink-0">
+                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                    </div>
+                    <div className="flex-1">
+                      <div className="text-xs text-gray-500 dark:text-gray-400 font-semibold uppercase">Experience</div>
+                      <div className="text-sm font-bold text-gray-900 dark:text-white">{selectedFaculty.experience}</div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         )
       }
-    </div >
+    </div>
   );
 };
 

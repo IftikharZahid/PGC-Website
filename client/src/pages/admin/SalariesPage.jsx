@@ -1,9 +1,10 @@
 import { useState } from 'react';
-import { DollarSign, Edit2, CheckCircle, Plus, Trash2 } from 'lucide-react';
+import { DollarSign, Edit2, CheckCircle, Plus, Trash2, Printer } from 'lucide-react';
 import DataTable from '../../components/admin/DataTable';
 import ConfirmDialog from '../../components/admin/ConfirmDialog';
 import TeacherForm from '../../components/admin/TeacherForm'; // Reusing TeacherForm for adding new staff
 import SalaryForm from '../../components/admin/SalaryForm';
+import SalarySlip from '../../components/admin/SalarySlip';
 import { getItems, updateItem, deleteItem, STORAGE_KEYS, logActivity } from '../../utils/adminStorage';
 import { useAdmin } from '../../context/AdminContext';
 
@@ -24,8 +25,8 @@ const SalariesPage = () => {
     const [editingSalary, setEditingSalary] = useState(null);
     const [deleteDialog, setDeleteDialog] = useState({ isOpen: false, teacher: null });
     const { showNotification } = useAdmin();
-
     const [isAddSalaryOpen, setIsAddSalaryOpen] = useState(false);
+    const [viewingSlip, setViewingSlip] = useState(null);
 
     const refresh = () => setTeachers(loadTeachers());
 
@@ -82,6 +83,7 @@ const SalariesPage = () => {
         setIsAddOpen(false);
         setEditingSalary(null);
         setIsAddSalaryOpen(false);
+        setViewingSlip(null);
         refresh();
     };
 
@@ -132,13 +134,22 @@ const SalariesPage = () => {
                 }
 
                 return isPaid ? (
-                    <button
-                        onClick={() => markAsUnpaid(row)}
-                        className="px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs font-medium flex items-center gap-1 w-fit hover:bg-green-200 transition cursor-pointer border border-transparent hover:border-green-300"
-                        title="Click to revert to Unpaid"
-                    >
-                        <CheckCircle className="w-3 h-3" /> Paid
-                    </button>
+                    <div className="flex items-center gap-2">
+                        <button
+                            onClick={() => markAsUnpaid(row)}
+                            className="px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs font-medium flex items-center gap-1 w-fit hover:bg-green-200 transition cursor-pointer border border-transparent hover:border-green-300"
+                            title="Click to revert to Unpaid"
+                        >
+                            <CheckCircle className="w-3 h-3" /> Paid
+                        </button>
+                        <button
+                            onClick={() => setViewingSlip(row)}
+                            className="p-1.5 text-gray-500 hover:text-primary-600 hover:bg-gray-100 rounded-full transition-colors"
+                            title="Print Salary Slip"
+                        >
+                            <Printer className="w-4 h-4" />
+                        </button>
+                    </div>
                 ) : (
                     <button
                         onClick={() => markAsPaid(row)}
@@ -174,8 +185,6 @@ const SalariesPage = () => {
         }
     ];
 
-
-
     return (
         <div className="space-y-2">
             <div className="flex items-center justify-between mb-2">
@@ -201,6 +210,7 @@ const SalariesPage = () => {
                 columns={columns}
                 data={teachers}
                 compact={true}
+                disablePagination={true}
                 searchPlaceholder="Search staff..."
                 emptyMessage="No staff records found."
             />
@@ -221,6 +231,13 @@ const SalariesPage = () => {
                 <SalaryForm
                     teacher={editingSalary}
                     onClose={closeModals}
+                />
+            )}
+
+            {viewingSlip && (
+                <SalarySlip
+                    teacher={viewingSlip}
+                    onClose={() => setViewingSlip(null)}
                 />
             )}
 

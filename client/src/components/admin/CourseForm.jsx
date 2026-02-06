@@ -1,10 +1,15 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { X } from 'lucide-react';
-import { addItem, updateItem, getItems, STORAGE_KEYS, logActivity } from '../../utils/adminStorage';
+import { logActivity } from '../../utils/adminStorage';
 import { useAdmin } from '../../context/AdminContext';
+import { useCreateCourseMutation, useUpdateCourseMutation, useGetCoursesQuery } from '../../store/api/coursesApi';
 
 const CourseForm = ({ course, onClose }) => {
     const { showNotification } = useAdmin();
+    const [createCourse] = useCreateCourseMutation();
+    const [updateCourse] = useUpdateCourseMutation();
+    const { data: coursesData } = useGetCoursesQuery();
+
     const [formData, setFormData] = useState({
         courseId: '',
         courseName: '',
@@ -12,7 +17,6 @@ const CourseForm = ({ course, onClose }) => {
         semesters: 4,
         subjects: []
     });
-    const [availableSubjects, setAvailableSubjects] = useState([]);
     const [selectedSubject, setSelectedSubject] = useState('');
 
     // Predefined course-to-subjects mapping
@@ -26,10 +30,19 @@ const CourseForm = ({ course, onClose }) => {
         'FA': ['Urdu', 'Islamiyat Compulsory', 'English', 'Civics', 'Islamiyat Optional', 'Health and Physical']
     };
 
-    useEffect(() => {
-        const subjects = getItems(STORAGE_KEYS.SUBJECTS);
-        setAvailableSubjects(subjects.map(s => s.subjectName));
+    // Derive available subjects from existing courses
+    const availableSubjects = useMemo(() => {
+        if (!coursesData?.success) return [];
+        const allSubjects = coursesData.data.reduce((acc, curr) => {
+            if (curr.subjects && Array.isArray(curr.subjects)) {
+                return [...acc, ...curr.subjects];
+            }
+            return acc;
+        }, []);
+        return [...new Set(allSubjects)].sort();
+    }, [coursesData]);
 
+    useEffect(() => {
         if (course) {
             setFormData({
                 courseId: course.courseId || '',
@@ -45,41 +58,26 @@ const CourseForm = ({ course, onClose }) => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
 
-        // Auto-populate subjects when course name matches
-        if (name === 'courseName' && COURSE_SUBJECTS_MAP[value]) {
+        // Auto-populate subjects when course name matches and subjects list is empty
+        if (name === 'courseName' && COURSE_SUBJECTS_MAP[value] && formData.subjects.length === 0) {
             const requiredSubjects = COURSE_SUBJECTS_MAP[value];
-
-            // Ensure all required subjects exist in the subjects list
-            const existingSubjects = getItems(STORAGE_KEYS.SUBJECTS);
-            const existingSubjectNames = existingSubjects.map(s => s.subjectName);
-
-            requiredSubjects.forEach(subjectName => {
-                if (!existingSubjectNames.includes(subjectName)) {
-                    // Create the missing subject
-                    const newSubject = {
-                        subjectName,
-                        subjectCode: subjectName.substring(0, 3).toUpperCase(),
-                        totalMarks: 100,
-                        passingMarks: 33
-                    };
-                    addItem(STORAGE_KEYS.SUBJECTS, newSubject);
-                }
-            });
-
-            // Update available subjects and auto-assign to course
-            const updatedSubjects = getItems(STORAGE_KEYS.SUBJECTS);
-            setAvailableSubjects(updatedSubjects.map(s => s.subjectName));
             setFormData(prev => ({ ...prev, subjects: requiredSubjects }));
-
             showNotification(`Auto-populated ${requiredSubjects.length} subjects for ${value}`, 'success');
         }
     };
 
     const addSubject = () => {
-        if (selectedSubject && !formData.subjects.includes(selectedSubject)) {
-            setFormData(prev => ({ ...prev, subjects: [...prev.subjects, selectedSubject] }));
-            setSelectedSubject('');
+        if (!selectedSubject.trim()) return;
+        const subjectName = selectedSubject.trim();
+
+        if (formData.subjects.includes(subjectName)) {
+            showNotification('Subject already added to this course', 'warning');
+            return;
         }
+
+        setFormData(prev => ({ ...prev, subjects: [...prev.subjects, subjectName] }));
+        showNotification(`Subject "${subjectName}" added`, 'success');
+        setSelectedSubject('');
     };
 
     const removeSubject = (subject) => {
@@ -89,22 +87,26 @@ const CourseForm = ({ course, onClose }) => {
         }));
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
 
         try {
             if (course) {
-                updateItem(STORAGE_KEYS.COURSES, course.id, formData);
+                await updateCourse({
+                    id: course.id,
+                    ...formData
+                }).unwrap();
                 logActivity('Course Updated', `Updated course: ${formData.courseName}`);
                 showNotification('Course updated successfully', 'success');
             } else {
-                addItem(STORAGE_KEYS.COURSES, formData);
+                await createCourse(formData).unwrap();
                 logActivity('Course Added', `Added new course: ${formData.courseName}`);
                 showNotification('Course added successfully', 'success');
             }
             onClose();
         } catch (error) {
-            showNotification('Failed to save course', 'error');
+            console.error('Course save error:', error);
+            showNotification(error.data?.message || 'Failed to save course', 'error');
         }
     };
 
@@ -182,19 +184,28 @@ const CourseForm = ({ course, onClose }) => {
                                 <div className="md:col-span-2">
                                     <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">Subjects</label>
                                     <div className="flex gap-2 mb-2">
-                                        <select
+                                        <input
+                                            list="subject-suggestions"
+                                            type="text"
                                             value={selectedSubject}
                                             onChange={(e) => setSelectedSubject(e.target.value)}
-                                            className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100"
-                                        >
-                                            <option value="">Select Subject</option>
+                                            placeholder="Select or type new subject"
+                                            className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-primary-500 outline-none"
+                                            onKeyDown={(e) => {
+                                                if (e.key === 'Enter') {
+                                                    e.preventDefault();
+                                                    addSubject();
+                                                }
+                                            }}
+                                        />
+                                        <datalist id="subject-suggestions">
                                             {availableSubjects
                                                 .filter(subject => !formData.subjects.includes(subject))
                                                 .map(subject => (
-                                                    <option key={subject} value={subject}>{subject}</option>
+                                                    <option key={subject} value={subject} />
                                                 ))
                                             }
-                                        </select>
+                                        </datalist>
                                         <button
                                             type="button"
                                             onClick={addSubject}

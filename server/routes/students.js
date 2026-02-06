@@ -64,6 +64,21 @@ router.put('/:id', async (req, res) => {
       });
     }
 
+    // Check for duplicate roll number if being updated
+    if (rollNo && rollNo !== student.rollNo) {
+      const existingRollNo = await Student.findOne({
+        rollNo,
+        _id: { $ne: req.params.id } // Exclude current student
+      });
+
+      if (existingRollNo) {
+        return res.status(409).json({
+          success: false,
+          message: 'Roll Number already exists'
+        });
+      }
+    }
+
     // Update fields
     student.name = name || student.name;
     student.email = email || student.email;

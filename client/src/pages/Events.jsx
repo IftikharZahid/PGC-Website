@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import RevealOnScroll from '../components/RevealOnScroll';
+import PageHero from '../components/PageHero';
 
 const Events = () => {
   const [activeTab, setActiveTab] = useState('All');
@@ -120,17 +121,10 @@ const Events = () => {
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="relative px-4 bg-secondary-700 text-white overflow-hidden h-[180px] md:h-[200px]">
-        <div className="absolute inset-0 bg-black/25"></div>
-        <div className="relative max-w-7xl mx-auto h-full flex items-center justify-center">
-          <div className="text-center animate-fade-in w-full py-4">
-            <h1 className="text-2xl md:text-4xl font-bold mt-20">Campus Events</h1>
-            <p className="text-sm md:text-base text-white/90 max-w-2xl mx-auto">
-              Stay connected with exciting activities, competitions, and learning opportunities
-            </p>
-          </div>
-        </div>
-      </section>
+      <PageHero
+        title="Campus Events"
+        subtitle="Stay connected with exciting activities, competitions, and learning opportunities"
+      />
 
       {/* Filter Tabs */}
       <section className="py-8 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 sticky top-16 z-40 shadow-sm">
@@ -141,8 +135,8 @@ const Events = () => {
                 key={category}
                 onClick={() => setActiveTab(category)}
                 className={`px-6 py-2 rounded-full text-sm font-semibold transition-all duration-300 ${activeTab === category
-                    ? 'bg-primary-600 text-white shadow-lg scale-105'
-                    : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                  ? 'bg-primary-600 text-white shadow-lg scale-105'
+                  : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
                   }`}
               >
                 {category}
@@ -169,7 +163,7 @@ const Events = () => {
               <RevealOnScroll key={event.id} animation="animate-fade-up" delay={`${index * 0.1}s`}>
                 <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden group hover:-translate-y-2 transition-all duration-300 flex flex-col h-full">
                   {/* Event Icon/Image */}
-                  <div className="relative h-48 bg-secondary-700 flex items-center justify-center text-7xl overflow-hidden">
+                  <div className="relative h-48 bg-secondary-700 dark:bg-gray-700 flex items-center justify-center text-7xl overflow-hidden">
                     <div className="transform transition-transform duration-500 group-hover:scale-125">
                       {event.image}
                     </div>

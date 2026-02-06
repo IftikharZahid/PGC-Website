@@ -1,0 +1,38 @@
+{
+  "fullName": "Iftikhar Zahid",
+  "fatherName": "M Ali",
+  "email": "Zikki@pgc.edu.com",
+  "phone": "0304-5631512",
+  "dateOfBirth": "2026-02-21",
+  "gender": "male",
+  "address": {
+    "street": "Fort Abbas",
+    "city": "Fort Abbas",
+    "state": "Punjab",
+    "postalCode": "620620",
+    "country": "Pakistan"
+  },
+  "academic": {
+    "previousSchool": "Govt Hight School Fort Abbas",
+    "graduationYear": "2020",
+    "gpa": "654"
+  },
+  "program": {
+    "desiredCourse": "ICS",
+    "preferredTerm": "2025-2027"
+  },
+  "documents": {
+    "profilePicture": "",
+    "matricResultCard": "",
+    "cnicPicture": ""
+  },
+  "enrolledSubjects": [
+    "English",
+    "Computer Science",
+    "Mathematics",
+    "Physics",
+    "Urdu",
+    "Islamiyat",
+    "Tarjuma tul Quran"
+  ]
+}

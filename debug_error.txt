@@ -1,0 +1,20 @@
+{
+  "message": "Admission validation failed: documents.cnicPicture: Path `documents.cnicPicture` is required.",
+  "stack": "ValidationError: Admission validation failed: documents.cnicPicture: Path `documents.cnicPicture` is required.\n    at Document.invalidate (C:\\Users\\USER\\Desktop\\PGC Website\\server\\node_modules\\mongoose\\lib\\document.js:3370:32)\n    at validatePath (C:\\Users\\USER\\Desktop\\PGC Website\\server\\node_modules\\mongoose\\lib\\document.js:3145:13)\n    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at async Promise.all (index 0)\n    at async model.$__validate (C:\\Users\\USER\\Desktop\\PGC Website\\server\\node_modules\\mongoose\\lib\\document.js:3086:3)\n    at async model.validate (C:\\Users\\USER\\Desktop\\PGC Website\\server\\node_modules\\mongoose\\lib\\document.js:2663:5)\n    at async model.validateBeforeSave (C:\\Users\\USER\\Desktop\\PGC Website\\server\\node_modules\\mongoose\\lib\\plugins\\validateBeforeSave.js:34:7)\n    at async Kareem.execPre (C:\\Users\\USER\\Desktop\\PGC Website\\server\\node_modules\\kareem\\index.js:65:24)\n    at async model.$__save (C:\\Users\\USER\\Desktop\\PGC Website\\server\\node_modules\\mongoose\\lib\\model.js:369:5)\n    at async model.save (C:\\Users\\USER\\Desktop\\PGC Website\\server\\node_modules\\mongoose\\lib\\model.js:609:5)",
+  "validation": {
+    "documents.cnicPicture": {
+      "name": "ValidatorError",
+      "message": "Path `documents.cnicPicture` is required.",
+      "properties": {
+        "message": "Path `documents.cnicPicture` is required.",
+        "type": "required",
+        "path": "documents.cnicPicture",
+        "value": "",
+        "length": 0
+      },
+      "kind": "required",
+      "path": "documents.cnicPicture",
+      "value": ""
+    }
+  }
+}

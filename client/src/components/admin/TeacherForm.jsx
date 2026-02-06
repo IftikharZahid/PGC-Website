@@ -1,10 +1,15 @@
 import { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
-import { addItem, updateItem, getItems, STORAGE_KEYS, logActivity } from '../../utils/adminStorage';
+import { getItems, STORAGE_KEYS, logActivity } from '../../utils/adminStorage';
 import { useAdmin } from '../../context/AdminContext';
+import { useCreateTeacherMutation, useUpdateTeacherMutation } from '../../store/api/teachersApi';
 
 const TeacherForm = ({ teacher, onClose }) => {
     const { showNotification } = useAdmin();
+    // RTK Query Mutations
+    const [createTeacher] = useCreateTeacherMutation();
+    const [updateTeacher] = useUpdateTeacherMutation();
+
     const [formData, setFormData] = useState({
         name: '',
         subjects: [],
@@ -23,7 +28,7 @@ const TeacherForm = ({ teacher, onClose }) => {
     const [isEditingPassword, setIsEditingPassword] = useState(false);
 
     useEffect(() => {
-        // Load available subjects
+        // Load available subjects from local storage (keeping this for now as subjects might be static)
         const subjects = getItems(STORAGE_KEYS.SUBJECTS);
         setAvailableSubjects(subjects.map(s => s.subjectName));
 
@@ -96,34 +101,21 @@ const TeacherForm = ({ teacher, onClose }) => {
                 dataToSave.password = formData.password.trim();
             }
 
-            const url = teacher ? `/api/teachers/${teacher.id}` : '/api/teachers';
-            const method = teacher ? 'PUT' : 'POST';
-
-            const response = await fetch(url, {
-                method,
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(dataToSave)
-            });
-
-            const result = await response.json();
-
-            if (!response.ok) {
-                throw new Error(result.message || 'Failed to save');
-            }
-
             if (teacher) {
+                // UPDATE
+                await updateTeacher({ id: teacher.id || teacher._id, ...dataToSave }).unwrap();
                 logActivity('Teacher Updated', `Updated teacher: ${dataToSave.name}`);
                 showNotification('Teacher updated successfully', 'success');
             } else {
+                // CREATE
+                await createTeacher(dataToSave).unwrap();
                 logActivity('Teacher Added', `Added new teacher: ${dataToSave.name}`);
                 showNotification('Teacher added successfully', 'success');
             }
-            // Trigger refresh
-            window.dispatchEvent(new Event('storage'));
             onClose();
         } catch (error) {
             console.error(error);
-            showNotification(error.message || 'Failed to check validation or save teacher', 'error');
+            showNotification(error.data?.message || 'Failed to save teacher', 'error');
         }
     };
 

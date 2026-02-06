@@ -1,60 +1,42 @@
 import express from 'express';
+import Course from '../models/Course.js';
 
 const router = express.Router();
 
-// Dummy course data
-const courses = [
-  {
-    id: 1,
-    title: "Computer Science & Engineering",
-    description: "Comprehensive program covering software development, algorithms, data structures, and modern computing technologies.",
-    duration: "4 Years",
-    instructor: "Dr. Sarah Johnson"
-  },
-  {
-    id: 2,
-    title: "Business Administration",
-    description: "Learn core business principles, management strategies, marketing, finance, and entrepreneurship skills.",
-    duration: "3 Years",
-    instructor: "Prof. Michael Chen"
-  },
-  {
-    id: 3,
-    title: "Mechanical Engineering",
-    description: "Study design, analysis, and manufacturing of mechanical systems with hands-on laboratory experience.",
-    duration: "4 Years",
-    instructor: "Dr. Robert Williams"
-  },
-  {
-    id: 4,
-    title: "English Literature",
-    description: "Explore classical and contemporary literature, creative writing, and critical analysis of literary works.",
-    duration: "3 Years",
-    instructor: "Prof. Emily Thompson"
-  },
-  {
-    id: 5,
-    title: "Data Science & Analytics",
-    description: "Master data analysis, machine learning, statistical modeling, and big data technologies.",
-    duration: "2 Years",
-    instructor: "Dr. David Martinez"
-  },
-  {
-    id: 6,
-    title: "Psychology",
-    description: "Understand human behavior, mental processes, counseling techniques, and research methodologies.",
-    duration: "4 Years",
-    instructor: "Dr. Lisa Anderson"
-  }
-];
-
 // GET /api/courses - Get all courses
-router.get('/', (req, res) => {
+router.get('/', async (req, res) => {
   try {
+    const courses = await Course.find({}).sort({ courseName: 1 });
     res.json({
       success: true,
       count: courses.length,
       data: courses
+    });
+  } catch (error) {
+    console.error('Get courses error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error fetching courses',
+      error: error.message
+    });
+  }
+});
+
+// GET /api/courses/:id - Get single course by ID
+router.get('/:id', async (req, res) => {
+  try {
+    const course = await Course.findById(req.params.id);
+
+    if (!course) {
+      return res.status(404).json({
+        success: false,
+        message: 'Course not found'
+      });
+    }
+
+    res.json({
+      success: true,
+      data: course
     });
   } catch (error) {
     res.status(500).json({
@@ -65,26 +47,105 @@ router.get('/', (req, res) => {
   }
 });
 
-// GET /api/courses/:id - Get single course by ID
-router.get('/:id', (req, res) => {
+// POST /api/courses - Create new course
+router.post('/', async (req, res) => {
   try {
-    const course = courses.find(c => c.id === parseInt(req.params.id));
-    
+    const { courseId, courseName, duration, semesters, subjects } = req.body;
+
+    // Check for existing course ID
+    const existingCourse = await Course.findOne({ courseId });
+    if (existingCourse) {
+      return res.status(400).json({
+        success: false,
+        message: 'Course ID already exists'
+      });
+    }
+
+    const newCourse = await Course.create({
+      courseId,
+      courseName,
+      duration,
+      semesters,
+      subjects
+    });
+
+    res.status(201).json({
+      success: true,
+      message: 'Course created successfully',
+      data: newCourse
+    });
+  } catch (error) {
+    console.error('Create course error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error creating course',
+      error: error.message
+    });
+  }
+});
+
+// PUT /api/courses/:id - Update course
+router.put('/:id', async (req, res) => {
+  try {
+    const { courseId, courseName, duration, semesters, subjects } = req.body;
+
+    let course = await Course.findById(req.params.id);
+
     if (!course) {
       return res.status(404).json({
         success: false,
         message: 'Course not found'
       });
     }
-    
+
+    // Update fields
+    course.courseId = courseId || course.courseId;
+    course.courseName = courseName || course.courseName;
+    course.duration = duration || course.duration;
+    course.semesters = semesters || course.semesters;
+    course.subjects = subjects || course.subjects;
+
+    await course.save();
+
     res.json({
       success: true,
+      message: 'Course updated successfully',
       data: course
     });
+
   } catch (error) {
+    console.error('Update course error:', error);
     res.status(500).json({
       success: false,
-      message: 'Server error',
+      message: 'Server error updating course',
+      error: error.message
+    });
+  }
+});
+
+// DELETE /api/courses/:id - Delete course
+router.delete('/:id', async (req, res) => {
+  try {
+    const course = await Course.findById(req.params.id);
+
+    if (!course) {
+      return res.status(404).json({
+        success: false,
+        message: 'Course not found'
+      });
+    }
+
+    await course.deleteOne();
+
+    res.json({
+      success: true,
+      message: 'Course deleted successfully'
+    });
+  } catch (error) {
+    console.error('Delete course error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error deleting course',
       error: error.message
     });
   }

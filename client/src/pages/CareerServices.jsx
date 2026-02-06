@@ -1,5 +1,6 @@
 import React from 'react';
 import RevealOnScroll from '../components/RevealOnScroll';
+import PageHero from '../components/PageHero';
 
 const CareerServices = () => {
   const services = [
@@ -84,17 +85,10 @@ const CareerServices = () => {
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="relative px-4 bg-secondary-700 text-white overflow-hidden h-[150px]">
-        <div className="absolute inset-0 bg-black/25"></div>
-        <div className="relative max-w-7xl mx-auto h-full flex items-center justify-center">
-          <div className="text-center animate-fade-in w-full py-4">
-            <h1 className="text-2xl md:text-3xl font-bold mt-20">Career Services</h1>
-            <p className="text-sm md:text-base text-white/90 max-w-3xl mx-auto">
-              Empowering students to discover, develop, and achieve their career aspirations
-            </p>
-          </div>
-        </div>
-      </section>
+      <PageHero
+        title="Career Services"
+        subtitle="Empowering students to discover, develop, and achieve their career aspirations"
+      />
 
       {/* Services Grid */}
       <section className="py-8 px-4 bg-white dark:bg-gray-800">
@@ -188,15 +182,15 @@ const CareerServices = () => {
       </section>
 
       {/* CTA Section */}
-      <section className="py-6 px-4 bg-secondary-700 text-white">
+      <section className="py-6 px-4 bg-secondary-700 dark:bg-gray-800 text-white">
         <div className="max-w-4xl mx-auto text-center">
           <RevealOnScroll animation="animate-fade-up">
-            <h2 className="text-2xl md:text-3xl font-bold mb-4">Ready to Plan Your Future?</h2>
-            <p className="text-base mb-6 text-white/90">
+            <h2 className="text-2xl md:text-3xl font-bold mb-4 text-white">Ready to Plan Your Future?</h2>
+            <p className="text-base mb-6 text-white/90 dark:text-gray-300">
               Schedule an appointment with our career counselors today and take the first step towards your dream career.
             </p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
-              <button className="bg-white text-primary-700 px-6 py-3 rounded-lg font-bold text-base hover:bg-gray-100 transition-colors shadow-lg hover:shadow-xl transform hover:-translate-y-1">
+              <button className="bg-white dark:bg-gray-700 text-primary-700 dark:text-white px-6 py-3 rounded-lg font-bold text-base hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors shadow-lg hover:shadow-xl transform hover:-translate-y-1">
                 Book Appointment
               </button>
               <button className="bg-transparent border-2 border-white text-white px-6 py-3 rounded-lg font-bold text-base hover:bg-white/10 transition-colors">

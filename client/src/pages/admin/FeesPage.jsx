@@ -3,6 +3,7 @@ import { DollarSign, Plus, Check, X as XIcon, Edit2, Trash2, Search } from 'luci
 import DataTable from '../../components/admin/DataTable';
 import ConfirmDialog from '../../components/admin/ConfirmDialog';
 import FeeForm from '../../components/admin/FeeForm';
+import FeeSlip from '../../components/admin/FeeSlip';
 import { getItems, updateItem, deleteItem, STORAGE_KEYS, logActivity, addItem, initializeDemoData } from '../../utils/adminStorage';
 import { useAdmin } from '../../context/AdminContext';
 
@@ -14,6 +15,7 @@ const FeesPage = () => {
 
     const [fees, setFees] = useState(loadFees());
     const [showForm, setShowForm] = useState(false);
+    const [viewingSlip, setViewingSlip] = useState(null);
     const [editingFee, setEditingFee] = useState(null);
     const [deleteDialog, setDeleteDialog] = useState({ isOpen: false, fee: null });
     const [showPaymentDialog, setShowPaymentDialog] = useState({ isOpen: false, fee: null });
@@ -22,6 +24,7 @@ const FeesPage = () => {
     const [searchFilter, setSearchFilter] = useState('');
     const [statusFilter, setStatusFilter] = useState('');
     const [courseFilter, setCourseFilter] = useState('');
+    const [monthFilter, setMonthFilter] = useState('');
 
     // Payment form state
     const [paymentAmount, setPaymentAmount] = useState('');
@@ -41,6 +44,17 @@ const FeesPage = () => {
         return [...new Set(courses)].sort();
     }, [fees]);
 
+    // Get unique months from fee records
+    const uniqueMonths = useMemo(() => {
+        const months = fees.map(f => {
+            const date = f.dueDate || f.lastPaymentDate || f.createdAt;
+            if (!date) return null;
+            const d = new Date(date);
+            return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+        }).filter(Boolean);
+        return [...new Set(months)].sort().reverse();
+    }, [fees]);
+
     // Filtered fees
     const filteredFees = useMemo(() => {
         return fees.filter(f => {
@@ -49,9 +63,23 @@ const FeesPage = () => {
                 f.rollNo?.toLowerCase().includes(searchFilter.toLowerCase());
             const matchesStatus = !statusFilter || f.status === statusFilter;
             const matchesCourse = !courseFilter || f.course === courseFilter;
-            return matchesSearch && matchesStatus && matchesCourse;
+
+            // Month filter
+            let matchesMonth = true;
+            if (monthFilter) {
+                const date = f.dueDate || f.lastPaymentDate || f.createdAt;
+                if (date) {
+                    const d = new Date(date);
+                    const feeMonth = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+                    matchesMonth = feeMonth === monthFilter;
+                } else {
+                    matchesMonth = false;
+                }
+            }
+
+            return matchesSearch && matchesStatus && matchesCourse && matchesMonth;
         });
-    }, [fees, searchFilter, statusFilter, courseFilter]);
+    }, [fees, searchFilter, statusFilter, courseFilter, monthFilter]);
 
     const handleEdit = (fee) => { setEditingFee(fee); setShowForm(true); };
     const handleDelete = (fee) => { setDeleteDialog({ isOpen: true, fee }); };
@@ -119,10 +147,7 @@ const FeesPage = () => {
 
     const columns = [
         { key: 'studentName', label: 'Student', sortable: true },
-        { key: 'rollNo', label: 'Roll No', sortable: true },
-        { key: 'course', label: 'Course', sortable: true },
-        { key: 'totalFee', label: 'Total', sortable: true, render: (v) => `Rs.${(v || 0).toLocaleString()}` },
-        { key: 'paidAmount', label: 'Paid', sortable: true, render: (v) => `Rs.${(v || 0).toLocaleString()}` },
+        // ... existing columns ...
         { key: 'balance', label: 'Balance', sortable: true, render: (v) => `Rs.${(v || 0).toLocaleString()}` },
         {
             key: 'status', label: 'Status', sortable: true,
@@ -136,6 +161,11 @@ const FeesPage = () => {
             key: 'actions', label: 'Actions', sortable: false,
             render: (_, row) => (
                 <div className="flex gap-1">
+                    {row.status === 'paid' && (
+                        <button onClick={() => setViewingSlip(row)} className="p-1 text-purple-600 hover:bg-purple-50 dark:hover:bg-purple-900/20 rounded" title="Print Fee Slip">
+                            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" /></svg>
+                        </button>
+                    )}
                     {row.status !== 'paid' && (
                         <>
                             <button onClick={() => handleRecordPayment(row)} className="p-1 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded" title="Record Payment"><DollarSign className="w-3.5 h-3.5" /></button>
@@ -151,7 +181,8 @@ const FeesPage = () => {
 
     return (
         <div className="space-y-2">
-            {/* Header */}
+            {/* ... existing header and filters ... */}
+
             <div className="flex items-center justify-between">
                 <div>
                     <h1 className="text-lg font-bold text-gray-900 dark:text-gray-100">Fee Management</h1>
@@ -162,10 +193,9 @@ const FeesPage = () => {
                 </button>
             </div>
 
-            {/* Filters Row */}
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-3">
+                {/* ... Filters content ... */}
                 <div className="flex flex-wrap items-end gap-3">
-                    {/* Search */}
                     <div className="flex-1 min-w-[160px]">
                         <label className="block text-[10px] font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">Student / Roll No</label>
                         <div className="relative">
@@ -173,8 +203,7 @@ const FeesPage = () => {
                             <input type="text" value={searchFilter} onChange={(e) => setSearchFilter(e.target.value)} placeholder="Search..." className="w-full pl-7 pr-2 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:ring-1 focus:ring-primary-500 outline-none" />
                         </div>
                     </div>
-
-                    {/* Status Filter */}
+                    {/* ... other filters ... */}
                     <div className="min-w-[120px]">
                         <label className="block text-[10px] font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">Status</label>
                         <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} className="w-full px-2 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:ring-1 focus:ring-primary-500 outline-none">
@@ -184,8 +213,6 @@ const FeesPage = () => {
                             <option value="unpaid">Unpaid</option>
                         </select>
                     </div>
-
-                    {/* Course Filter */}
                     <div className="min-w-[140px]">
                         <label className="block text-[10px] font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">Course</label>
                         <select value={courseFilter} onChange={(e) => setCourseFilter(e.target.value)} className="w-full px-2 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:ring-1 focus:ring-primary-500 outline-none">
@@ -193,13 +220,20 @@ const FeesPage = () => {
                             {uniqueCourses.map(c => (<option key={c} value={c}>{c}</option>))}
                         </select>
                     </div>
-
-                    {/* Clear */}
-                    {(searchFilter || statusFilter || courseFilter) && (
-                        <button onClick={() => { setSearchFilter(''); setStatusFilter(''); setCourseFilter(''); }} className="px-2.5 py-1.5 text-xs font-semibold text-gray-600 dark:text-gray-400 border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">Clear</button>
+                    <div className="min-w-[130px]">
+                        <label className="block text-[10px] font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">Month</label>
+                        <select value={monthFilter} onChange={(e) => setMonthFilter(e.target.value)} className="w-full px-2 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:ring-1 focus:ring-primary-500 outline-none">
+                            <option value="">All Months</option>
+                            {uniqueMonths.map(m => {
+                                const [year, month] = m.split('-');
+                                const monthName = new Date(year, parseInt(month) - 1).toLocaleString('default', { month: 'short' });
+                                return (<option key={m} value={m}>{monthName} {year}</option>);
+                            })}
+                        </select>
+                    </div>
+                    {(searchFilter || statusFilter || courseFilter || monthFilter) && (
+                        <button onClick={() => { setSearchFilter(''); setStatusFilter(''); setCourseFilter(''); setMonthFilter(''); }} className="px-2.5 py-1.5 text-xs font-semibold text-gray-600 dark:text-gray-400 border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">Clear</button>
                     )}
-
-                    {/* Stats */}
                     <div className="flex gap-1.5 ml-auto">
                         <span className="px-2 py-1 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 rounded text-[10px] font-bold">Collected: Rs.{totalCollected.toLocaleString()}</span>
                         <span className="px-2 py-1 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 rounded text-[10px] font-bold">Due: Rs.{totalOutstanding.toLocaleString()}</span>
@@ -208,19 +242,16 @@ const FeesPage = () => {
                 </div>
             </div>
 
-            {/* Fee Records Table */}
             <DataTable columns={columns} data={filteredFees} compact={true} emptyMessage="No fee records found." searchable={false} />
 
-            {/* Fee Form */}
             {showForm && <FeeForm fee={editingFee} onClose={closeForm} />}
 
-            {/* Delete Confirmation */}
             <ConfirmDialog isOpen={deleteDialog.isOpen} title="Delete Fee Record" message={`Delete fee record for ${deleteDialog.fee?.studentName}?`} onConfirm={confirmDelete} onCancel={() => setDeleteDialog({ isOpen: false, fee: null })} confirmText="Delete" type="danger" />
 
-            {/* Payment Dialog */}
             {showPaymentDialog.isOpen && (
                 <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
                     <div className="bg-white dark:bg-gray-800 rounded-xl shadow-2xl max-w-sm w-full">
+                        {/* ... Payment Dialog Content ... */}
                         <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
                             <h2 className="text-lg font-bold text-gray-900 dark:text-gray-100">Record Payment</h2>
                             <button onClick={() => setShowPaymentDialog({ isOpen: false, fee: null })} className="text-gray-400 hover:text-gray-600"><XIcon className="w-5 h-5" /></button>
@@ -251,6 +282,9 @@ const FeesPage = () => {
                     </div>
                 </div>
             )}
+
+            {/* Fee Slip Modal */}
+            {viewingSlip && <FeeSlip fee={viewingSlip} onClose={() => setViewingSlip(null)} />}
         </div>
     );
 };

@@ -6,9 +6,15 @@ export default defineConfig({
   base: '/',
   plugins: [react()],
   server: {
+    host: true,
+    allowedHosts: true,
+    // hmr: {
+    //   clientPort: 443,
+    //   protocol: 'wss',
+    // },
     proxy: {
       '/api': {
-        target: 'http://127.0.0.1:5000',
+        target: 'http://localhost:5000',
         changeOrigin: true,
       },
     },

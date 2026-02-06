@@ -1,24 +1,23 @@
 import { useState } from 'react';
-import { Plus, BookOpen, Edit2, Trash2 } from 'lucide-react';
+import { Plus, Edit2, Trash2 } from 'lucide-react';
 import DataTable from '../../components/admin/DataTable';
 import ConfirmDialog from '../../components/admin/ConfirmDialog';
 import CourseForm from '../../components/admin/CourseForm';
-import { getItems, deleteItem, STORAGE_KEYS, logActivity } from '../../utils/adminStorage';
+import { logActivity } from '../../utils/adminStorage';
 import { useAdmin } from '../../context/AdminContext';
+import { useGetCoursesQuery, useDeleteCourseMutation } from '../../store/api/coursesApi';
 
 const CoursesPage = () => {
-    const loadCourses = () => getItems(STORAGE_KEYS.COURSES);
+    // RTK Query hooks
+    const { data: coursesData, isLoading } = useGetCoursesQuery();
+    const [deleteCourse] = useDeleteCourseMutation();
 
-    const [courses, setCourses] = useState(loadCourses());
+    const courses = coursesData?.success ? coursesData.data.map(c => ({ ...c, id: c._id })) : [];
+
     const [showForm, setShowForm] = useState(false);
     const [editingCourse, setEditingCourse] = useState(null);
     const [deleteDialog, setDeleteDialog] = useState({ isOpen: false, course: null });
     const { showNotification } = useAdmin();
-
-    const refresh = () => setCourses(loadCourses());
-
-    // loadCourses removed
-
 
     const handleEdit = (course) => {
         setEditingCourse(course);
@@ -29,22 +28,20 @@ const CoursesPage = () => {
         setDeleteDialog({ isOpen: true, course });
     };
 
-    const confirmDelete = () => {
+    const confirmDelete = async () => {
         try {
-            deleteItem(STORAGE_KEYS.COURSES, deleteDialog.course.id);
+            await deleteCourse(deleteDialog.course.id).unwrap();
             logActivity('Course Deleted', `Deleted course: ${deleteDialog.course.courseName}`);
             showNotification('Course deleted successfully', 'success');
-            refresh();
             setDeleteDialog({ isOpen: false, course: null });
-        } catch (_) {
-            showNotification('Failed to delete course', 'error');
+        } catch (error) {
+            showNotification(error.data?.message || 'Failed to delete course', 'error');
         }
     };
 
     const closeForm = () => {
         setShowForm(false);
         setEditingCourse(null);
-        refresh();
     };
 
     const columns = [
@@ -57,7 +54,7 @@ const CoursesPage = () => {
             label: 'Subjects',
             sortable: false,
             render: (value) => (
-                <span className="text-gray-600 dark:text-gray-400">{value.length} subjects</span>
+                <span className="text-gray-600 dark:text-gray-400">{value ? value.length : 0} subjects</span>
             )
         },
         {
@@ -85,8 +82,6 @@ const CoursesPage = () => {
         }
     ];
 
-
-
     return (
         <div className="space-y-2">
             <div className="flex items-center justify-between mb-2">
@@ -107,6 +102,8 @@ const CoursesPage = () => {
                 columns={columns}
                 data={courses}
                 compact={true}
+                disablePagination={true}
+                loading={isLoading}
                 searchPlaceholder="Search courses..."
                 emptyMessage="No courses found. Add your first course!"
             />

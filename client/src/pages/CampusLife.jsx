@@ -80,27 +80,36 @@ const CampusLife = () => {
         subtitle="A vibrant community of learners, leaders, and change-makers."
       />
 
-      {/* Societies Grid */}
-      <section className="py-6 px-4 bg-white dark:bg-gray-800">
+      {/* Societies Grid - Compact */}
+      <section className="py-8 px-4 bg-white dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700">
         <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-10">
-            <h2 className="text-2xl md:text-3xl font-bold mb-3 text-gray-900 dark:text-gray-100">Student Societies</h2>
-            <p className="text-gray-600 dark:text-gray-300 max-w-2xl mx-auto text-sm">
-              Our diverse range of societies ensures that every student finds a platform to express their talents and pursue their passions.
-            </p>
+          <div className="flex flex-col md:flex-row justify-between items-end mb-6 gap-4">
+            <div>
+              <h2 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-gray-100 mb-1">Student Societies</h2>
+              <p className="text-sm text-gray-600 dark:text-gray-400 max-w-xl">
+                Explore your passions with our diverse range of student-led organizations.
+              </p>
+            </div>
+            <span className="text-xs font-bold uppercase tracking-widest text-primary-600 dark:text-primary-400">
+              6 Active Clubs
+            </span>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {societies.map((society, index) => (
-              <RevealOnScroll key={index} animation="animate-fade-up" delay={`${index * 0.1}s`}>
-                <div className="bg-gray-50 dark:bg-gray-700 p-6 rounded-2xl hover:shadow-xl transition-all duration-300 hover:-translate-y-2 group">
-                  <div className="text-3xl mb-3 transform group-hover:scale-110 transition-transform duration-300">{society.icon}</div>
-                  <h3 className="text-lg font-bold mb-2 text-gray-900 dark:text-white group-hover:text-secondary-700 dark:group-hover:text-secondary-400 transition-colors">
-                    {society.title}
-                  </h3>
-                  <p className="text-gray-600 dark:text-gray-300 mb-3 text-sm">
-                    {society.description}
-                  </p>
+              <RevealOnScroll key={index} animation="animate-fade-up" delay={`${index * 0.05}s`}>
+                <div className="bg-gray-50 dark:bg-gray-900/50 p-4 rounded-xl border border-gray-100 dark:border-gray-700 hover:border-primary-200 dark:hover:border-primary-800 hover:shadow-md transition-all duration-300 flex gap-4 h-full group">
+                  <div className="text-2xl bg-white dark:bg-gray-800 w-12 h-12 flex items-center justify-center rounded-lg shadow-sm group-hover:scale-110 transition-transform">
+                    {society.icon}
+                  </div>
+                  <div>
+                    <h3 className="text-base font-bold text-gray-900 dark:text-white mb-1 group-hover:text-primary-700 dark:group-hover:text-primary-400 transition-colors">
+                      {society.title}
+                    </h3>
+                    <p className="text-xs text-gray-600 dark:text-gray-400 leading-relaxed">
+                      {society.description}
+                    </p>
+                  </div>
                 </div>
               </RevealOnScroll>
             ))}
@@ -108,34 +117,33 @@ const CampusLife = () => {
         </div>
       </section>
 
-      {/* Life at Campus - Facilities with alternating layout */}
-      <section className="py-6 px-4 bg-gray-50 dark:bg-gray-900">
+      {/* Facilities - Compact Grid */}
+      <section className="py-10 px-4 bg-gray-50 dark:bg-gray-900">
         <div className="max-w-7xl mx-auto">
-          <h2 className="text-2xl md:text-3xl font-bold text-center mb-10 text-gray-900 dark:text-gray-100">
-            World-Class Facilities
-          </h2>
+          <div className="mb-6 flex items-center gap-3">
+            <h2 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-gray-100">World-Class Facilities</h2>
+            <div className="h-px flex-1 bg-gray-200 dark:bg-gray-700"></div>
+          </div>
 
-          <div className="space-y-12">
+          <div className="grid md:grid-cols-3 gap-6">
             {facilities.map((facility, index) => (
-              <RevealOnScroll key={index} animation={index % 2 === 0 ? "animate-fade-right" : "animate-fade-left"}>
-                <div className={`flex flex-col md:flex-row gap-8 items-center ${index % 2 === 1 ? 'md:flex-row-reverse' : ''}`}>
-                  <div className="w-full md:w-1/2">
+              <RevealOnScroll key={index} animation="animate-fade-up" delay={`${index * 0.1}s`}>
+                <div className="group bg-white dark:bg-gray-800 rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 border border-gray-100 dark:border-gray-700 h-full flex flex-col">
+                  <div className="h-40 overflow-hidden relative">
                     <img
                       src={facility.image}
                       alt={facility.title}
-                      className="w-full h-56 object-cover rounded-2xl shadow-lg transform hover:scale-[1.02] transition-transform duration-500"
+                      className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700"
                     />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-60"></div>
+                    <h3 className="absolute bottom-3 left-3 text-lg font-bold text-white shadow-sm z-10">{facility.title}</h3>
                   </div>
-                  <div className="w-full md:w-1/2">
-                    <h3 className="text-2xl font-bold mb-3 text-gray-900 dark:text-white">{facility.title}</h3>
-                    <p className="text-base text-gray-600 dark:text-gray-300 leading-relaxed mb-4">
+                  <div className="p-4 flex-1 flex flex-col justify-between">
+                    <p className="text-sm text-gray-600 dark:text-gray-300 mb-3 leading-relaxed">
                       {facility.desc}
                     </p>
-                    <button className="text-primary-600 font-bold hover:text-primary-700 inline-flex items-center group transition-colors">
-                      Learn More
-                      <svg className="w-5 h-5 ml-2 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                      </svg>
+                    <button className="text-xs font-bold text-primary-600 dark:text-primary-400 uppercase tracking-wide hover:underline self-start">
+                      View Details
                     </button>
                   </div>
                 </div>

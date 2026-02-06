@@ -41,6 +41,17 @@ router.post('/signup', async (req, res) => {
       });
     }
 
+    // Check if duplicate roll number (if provided)
+    if (rollNo) {
+      const existingRollNo = await Student.findOne({ rollNo });
+      if (existingRollNo) {
+        return res.status(409).json({
+          success: false,
+          message: 'Roll Number already exists'
+        });
+      }
+    }
+
     // Generate Student ID
     const year = new Date().getFullYear();
     const randomNum = Math.floor(Math.random() * 10000).toString().padStart(4, '0');

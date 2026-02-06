@@ -1,14 +1,17 @@
 import { useState, useEffect } from 'react';
 import { X, Search } from 'lucide-react';
-import { addItem, updateItem, getItems, STORAGE_KEYS, logActivity } from '../../utils/adminStorage';
+import { getItems, STORAGE_KEYS, logActivity } from '../../utils/adminStorage';
 import { useAdmin } from '../../context/AdminContext';
 
 const ResultForm = ({ result, onClose }) => {
     const { showNotification } = useAdmin();
+    // Toggle for input mode: 'manual' or 'database'
+    const [entryMode, setEntryMode] = useState('manual');
     const [students, setStudents] = useState([]);
     const [filteredStudents, setFilteredStudents] = useState([]);
     const [subjects, setSubjects] = useState([]);
-    const [courses, setCourses] = useState([]);
+    const [allSubjects, setAllSubjects] = useState([]); // All subjects from localStorage
+    const [courses, setCourses] = useState([]); // Courses with their subjects
     const [selectedCourse, setSelectedCourse] = useState('');
     const [searchRollNo, setSearchRollNo] = useState('');
     const [formData, setFormData] = useState({
@@ -19,7 +22,8 @@ const ResultForm = ({ result, onClose }) => {
         marks: {},
         maxMarks: {},
         isPublished: false,
-        locked: false
+        locked: false,
+        studentId: '' // Added studentId to formData
     });
 
     useEffect(() => {
@@ -34,6 +38,7 @@ const ResultForm = ({ result, onClose }) => {
                     const mapped = data.data.map(s => ({
                         ...s,
                         id: s._id,
+                        // Priority: Explicit Roll No -> Student ID -> N/A
                         rollNo: s.rollNo || s.studentId || 'N/A',
                         course: s.class ? s.class.split(' - ')[0] : '',
                         semester: s.class ? s.class.split(' - ')[1] : '',
@@ -41,26 +46,41 @@ const ResultForm = ({ result, onClose }) => {
                     }));
                     setStudents(mapped);
                     setFilteredStudents(mapped);
-
-                    // Extract unique courses
-                    const uniqueCourses = [...new Set(mapped.map(s => s.course).filter(Boolean))];
-                    setCourses(uniqueCourses);
+                } else {
+                    // Fallback to local storage if API fails
+                    const studentList = getItems(STORAGE_KEYS.STUDENTS);
+                    setStudents(studentList);
+                    setFilteredStudents(studentList);
                 }
             } catch (error) {
                 console.error('Failed to load students:', error);
-                // Fallback to localStorage if API fails
+                // Fallback to local storage if API fails
                 const studentList = getItems(STORAGE_KEYS.STUDENTS);
                 setStudents(studentList);
                 setFilteredStudents(studentList);
-                const uniqueCourses = [...new Set(studentList.map(s => s.course).filter(Boolean))];
-                setCourses(uniqueCourses);
+            }
+        };
+
+        // Fetch courses with subjects from API
+        const fetchCourses = async () => {
+            try {
+                const response = await fetch('/api/courses');
+                const data = await response.json();
+
+                if (data.success && data.data) {
+                    setCourses(data.data);
+                }
+            } catch (error) {
+                console.error('Failed to load courses:', error);
             }
         };
 
         fetchStudents();
+        fetchCourses();
 
-        // Load subjects from localStorage (still managed locally)
+        // Load all subjects from localStorage as fallback
         const subjectList = getItems(STORAGE_KEYS.SUBJECTS);
+        setAllSubjects(subjectList);
         setSubjects(subjectList);
 
         // Always initialize maxMarks with subject defaults
@@ -70,31 +90,56 @@ const ResultForm = ({ result, onClose }) => {
         });
 
         if (result) {
-            // Merge existing maxMarks with defaults (existing values take priority)
-            const mergedMaxMarks = { ...defaultMaxMarks, ...(result.maxMarks || {}) };
+            // Map Name-keyed marks back to ID-keyed for form state
+            const marksById = {};
+            const maxMarksById = {};
+
+            // Create a lookup for subject name -> id
+            const nameToId = {};
+            subjectList.forEach(s => {
+                nameToId[s.subjectName] = s.id;
+            });
+
+            if (result.marks) {
+                Object.entries(result.marks).forEach(([name, mark]) => {
+                    const id = nameToId[name];
+                    if (id) marksById[id] = mark;
+                });
+            }
+
+            if (result.maxMarks) {
+                Object.entries(result.maxMarks).forEach(([name, max]) => {
+                    const id = nameToId[name];
+                    if (id) maxMarksById[id] = max;
+                });
+            }
+
+            // Merge with defaults
+            const mergedMaxMarks = { ...defaultMaxMarks, ...maxMarksById };
+
+            // Edit mode: populate form
             setFormData({
-                studentName: result.studentName || '',
-                rollNo: result.rollNo || '',
-                course: result.course || '',
-                semester: result.semester || '',
-                marks: result.marks || {},
+                studentName: result.studentName || result.name || '',
+                rollNo: result.rollNo || result.roll || '',
+                course: result.course || result.class || '',
+                semester: result.semester || result.session || '',
+                marks: marksById,
                 maxMarks: mergedMaxMarks,
                 isPublished: result.isPublished || result.published || false,
-                locked: result.locked || false
+                locked: result.locked || false,
+                studentId: result.studentId || ''
             });
+            // Editing implies manual override is okay, or we could detect if student exists
+            setEntryMode('manual');
         } else {
             setFormData(prev => ({ ...prev, maxMarks: defaultMaxMarks }));
         }
     }, [result]);
 
-    // Filter students based on course and roll number search
+    // Filter students logic (same as before)
     useEffect(() => {
         let filtered = students;
-
-        if (selectedCourse) {
-            filtered = filtered.filter(s => s.course === selectedCourse);
-        }
-
+        if (selectedCourse) filtered = filtered.filter(s => s.course === selectedCourse);
         if (searchRollNo.trim()) {
             const searchLower = searchRollNo.toLowerCase();
             filtered = filtered.filter(s =>
@@ -102,21 +147,52 @@ const ResultForm = ({ result, onClose }) => {
                 s.name?.toLowerCase().includes(searchLower)
             );
         }
-
         setFilteredStudents(filtered);
     }, [selectedCourse, searchRollNo, students]);
 
     const handleStudentChange = (e) => {
         const studentId = e.target.value;
         const student = students.find(s => s.id === studentId);
+
         if (student) {
-            setFormData(prev => ({
-                ...prev,
-                studentName: student.name,
-                rollNo: student.rollNo,
-                course: student.course,
-                semester: student.semester
-            }));
+            // Find course and load its subjects
+            const selectedCourseData = courses.find(c => c.courseName === student.course || c.courseId === student.course);
+            if (selectedCourseData && selectedCourseData.subjects && selectedCourseData.subjects.length > 0) {
+                const courseSubjects = allSubjects.filter(s =>
+                    selectedCourseData.subjects.includes(s.subjectName)
+                );
+                setSubjects(courseSubjects.length > 0 ? courseSubjects : allSubjects);
+
+                // Initialize maxMarks for course subjects
+                const defaultMaxMarks = {};
+                courseSubjects.forEach(s => {
+                    defaultMaxMarks[s.id] = s.totalMarks || 100;
+                });
+
+                setFormData(prev => ({
+                    ...prev,
+                    studentName: student.name,
+                    rollNo: student.rollNo,
+                    course: student.course,
+                    semester: student.semester,
+                    studentId: student.id,
+                    marks: {},
+                    maxMarks: defaultMaxMarks
+                }));
+            } else {
+                // No subjects defined, use all subjects
+                setSubjects(allSubjects);
+                setFormData(prev => ({
+                    ...prev,
+                    studentName: student.name,
+                    rollNo: student.rollNo,
+                    course: student.course,
+                    semester: student.semester,
+                    studentId: student.id,
+                    marks: {},
+                    maxMarks: prev.maxMarks
+                }));
+            }
         }
     };
 
@@ -140,26 +216,56 @@ const ResultForm = ({ result, onClose }) => {
         }));
     };
 
-    const handleSubmit = (e) => {
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        setFormData(prev => ({ ...prev, [name]: value }));
+
+        // Auto-fetch subjects when course is selected
+        if (name === 'course' && value) {
+            const selectedCourseData = courses.find(c => c.courseName === value || c.courseId === value);
+            if (selectedCourseData && selectedCourseData.subjects && selectedCourseData.subjects.length > 0) {
+                // Filter subjects based on course
+                const courseSubjects = allSubjects.filter(s =>
+                    selectedCourseData.subjects.includes(s.subjectName)
+                );
+                setSubjects(courseSubjects.length > 0 ? courseSubjects : allSubjects);
+
+                // Reset marks when course changes
+                const defaultMaxMarks = {};
+                courseSubjects.forEach(s => {
+                    defaultMaxMarks[s.id] = s.totalMarks || 100;
+                });
+                setFormData(prev => ({ ...prev, marks: {}, maxMarks: defaultMaxMarks }));
+            } else {
+                // No subjects defined for this course, show all
+                setSubjects(allSubjects);
+            }
+        }
+    };
+
+    const handleSubmit = async (e) => {
         e.preventDefault();
 
-        // Check for duplicate roll number
-        const existingResults = getItems(STORAGE_KEYS.RESULTS);
-        const duplicate = existingResults.find(r =>
-            r.rollNo.toLowerCase() === formData.rollNo.toLowerCase() &&
-            (!result || r.id !== result.id) // Ignore self when editing
-        );
+        // Convert ID-keyed marks to Name-keyed for storage/display
+        const marksByName = {};
+        const maxMarksByName = {};
 
-        if (duplicate) {
-            showNotification(`Result for Roll No ${formData.rollNo} already exists!`, 'error');
-            return;
-        }
+        subjects.forEach(subject => {
+            const mark = formData.marks[subject.id];
+            const max = formData.maxMarks[subject.id];
 
-        const totalMarks = Object.values(formData.maxMarks).reduce((sum, max) => sum + (parseInt(max) || 100), 0);
-        const obtainedMarks = Object.values(formData.marks).reduce((sum, mark) => sum + (parseInt(mark) || 0), 0);
-        const percentage = (obtainedMarks / totalMarks) * 100;
+            // Only include if marks are entered
+            if (mark !== undefined && mark !== '') {
+                marksByName[subject.subjectName] = parseInt(mark) || 0;
+                maxMarksByName[subject.subjectName] = parseInt(max) || 100;
+            }
+        });
 
-        // Calculate grade (standardized scale)
+        const totalMarks = Object.values(maxMarksByName).reduce((sum, max) => sum + max, 0);
+        const obtainedMarks = Object.values(marksByName).reduce((sum, mark) => sum + mark, 0);
+        const percentage = totalMarks > 0 ? (obtainedMarks / totalMarks) * 100 : 0;
+
+        // Calculate grade
         let grade = 'F';
         if (percentage >= 90) grade = 'A+';
         else if (percentage >= 80) grade = 'A';
@@ -168,27 +274,53 @@ const ResultForm = ({ result, onClose }) => {
         else if (percentage >= 50) grade = 'D';
         else if (percentage >= 40) grade = 'E';
 
+        // MAPPING TO BACKEND SCHEMA
         const resultData = {
-            ...formData,
+            name: formData.studentName,
+            roll: formData.rollNo,
+            class: formData.course,
+            session: formData.semester,
+            marks: marksByName,       // Send Name-keyed
+            maxMarks: maxMarksByName, // Send Name-keyed
             totalMarks,
             obtainedMarks,
             percentage,
             grade,
-            maxMarks: formData.maxMarks
+            isPublished: formData.isPublished,
+            id: result?._id || result?.id,
+            studentId: formData.studentId // Include studentId
         };
 
         try {
+            let response;
             if (result) {
-                updateItem(STORAGE_KEYS.RESULTS, result.id, resultData);
-                logActivity('Result Updated', `Updated result for: ${formData.studentName}`);
-                showNotification('Result updated successfully', 'success');
+                // Update existing
+                const id = result._id || result.id;
+                response = await fetch(`/api/results/${id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(resultData)
+                });
             } else {
-                addItem(STORAGE_KEYS.RESULTS, resultData);
-                logActivity('Result Added', `Added result for: ${formData.studentName}`);
-                showNotification('Result added successfully', 'success');
+                // Create new
+                response = await fetch('/api/results', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(resultData)
+                });
             }
-            onClose();
+
+            const data = await response.json();
+
+            if (data.success) {
+                logActivity(result ? 'Result Updated' : 'Result Added', `Result for: ${formData.studentName}`);
+                showNotification(result ? 'Result updated successfully' : 'Result added successfully', 'success');
+                onClose();
+            } else {
+                showNotification(data.message || 'Failed to save result', 'error');
+            }
         } catch (error) {
+            console.error(error);
             showNotification('Failed to save result', 'error');
         }
     };
@@ -215,108 +347,118 @@ const ResultForm = ({ result, onClose }) => {
                 <div className="flex-1 overflow-y-auto">
                     <form onSubmit={handleSubmit} className="flex flex-col h-full">
                         <div className="p-4 sm:p-6 flex-1 space-y-4">
-                            {/* Student Selection */}
+
+                            {/* Toggle Entry Mode */}
                             {!result && (
+                                <div className="flex bg-gray-100 dark:bg-gray-700 p-1 rounded-lg mb-4">
+                                    <button
+                                        type="button"
+                                        onClick={() => { setEntryMode('manual'); setFormData(prev => ({ ...prev, studentId: '' })); }} // Clear studentId on manual
+                                        className={`flex-1 py-1.5 text-sm font-medium rounded-md transition-colors ${entryMode === 'manual' ? 'bg-white dark:bg-gray-600 shadow-sm text-gray-900 dark:text-white' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'}`}
+                                    >
+                                        Manual Entry
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => setEntryMode('database')}
+                                        className={`flex-1 py-1.5 text-sm font-medium rounded-md transition-colors ${entryMode === 'database' ? 'bg-white dark:bg-gray-600 shadow-sm text-gray-900 dark:text-white' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'}`}
+                                    >
+                                        Select from Database
+                                    </button>
+                                </div>
+                            )}
+
+                            {/* Database Selection Mode */}
+                            {entryMode === 'database' && !result && (
                                 <>
-                                    {/* Search & Filter Section */}
                                     <div className="bg-gray-50 dark:bg-gray-900 rounded-xl p-4 space-y-3 border border-gray-200 dark:border-gray-700">
                                         <h3 className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">Find Student</h3>
-
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                                            {/* Class/Course Filter */}
                                             <div>
                                                 <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Filter by Class</label>
-                                                <select
-                                                    value={selectedCourse}
-                                                    onChange={(e) => setSelectedCourse(e.target.value)}
-                                                    className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-primary-500 outline-none"
-                                                >
+                                                <select value={selectedCourse} onChange={(e) => setSelectedCourse(e.target.value)} className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-primary-500 outline-none">
                                                     <option value="">All Classes</option>
-                                                    {courses.map(course => (
-                                                        <option key={course} value={course}>{course}</option>
-                                                    ))}
+                                                    {courses.map(course => (<option key={course._id || course.courseId} value={course.courseName}>{course.courseName}</option>))}
                                                 </select>
                                             </div>
-
-                                            {/* Search by Roll Number */}
                                             <div>
                                                 <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Search by Roll No / Name</label>
                                                 <div className="relative">
                                                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                                                    <input
-                                                        type="text"
-                                                        value={searchRollNo}
-                                                        onChange={(e) => setSearchRollNo(e.target.value)}
-                                                        placeholder="Enter roll number or name..."
-                                                        className="w-full pl-9 pr-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-primary-500 outline-none"
-                                                    />
+                                                    <input type="text" value={searchRollNo} onChange={(e) => setSearchRollNo(e.target.value)} placeholder="Enter roll number or name..." className="w-full pl-9 pr-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-primary-500 outline-none" />
                                                 </div>
                                             </div>
                                         </div>
-
-                                        {/* Filter Info & Clear */}
                                         <div className="flex items-center justify-between text-xs">
-                                            <span className="text-gray-500 dark:text-gray-400">
-                                                Found <span className="font-semibold text-primary-600">{filteredStudents.length}</span> students
-                                            </span>
-                                            {(selectedCourse || searchRollNo) && (
-                                                <button
-                                                    type="button"
-                                                    onClick={clearFilters}
-                                                    className="text-primary-600 hover:text-primary-700 font-medium"
-                                                >
-                                                    Clear filters
-                                                </button>
-                                            )}
+                                            <span className="text-gray-500 dark:text-gray-400">Found <span className="font-semibold text-primary-600">{filteredStudents.length}</span> students</span>
+                                            {(selectedCourse || searchRollNo) && (<button type="button" onClick={clearFilters} className="text-primary-600 hover:text-primary-700 font-medium">Clear filters</button>)}
                                         </div>
                                     </div>
-
-                                    {/* Student Selection Dropdown */}
                                     <div>
                                         <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">Select Student *</label>
-                                        <select
-                                            onChange={handleStudentChange}
-                                            className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-primary-500 outline-none"
-                                            required
-                                            defaultValue=""
-                                        >
-                                            <option value="" disabled>
-                                                {filteredStudents.length === 0
-                                                    ? 'No students found'
-                                                    : `Select from ${filteredStudents.length} students`
-                                                }
-                                            </option>
-                                            {filteredStudents.map(s => (
-                                                <option key={s.id} value={s.id}>
-                                                    {s.rollNo} - {s.name} ({s.course})
-                                                </option>
-                                            ))}
+                                        <select onChange={handleStudentChange} className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-primary-500 outline-none" defaultValue="" required={entryMode === 'database'}>
+                                            <option value="" disabled>{filteredStudents.length === 0 ? 'No students found' : `Select from ${filteredStudents.length} students`}</option>
+                                            {filteredStudents.map(s => (<option key={s.id} value={s.id}>{s.rollNo} - {s.name} ({s.course})</option>))}
                                         </select>
                                     </div>
                                 </>
                             )}
 
-                            {/* Student Info (Read-only) */}
-                            {formData.studentName && (
-                                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-4 bg-primary-50 dark:bg-primary-900/20 rounded-xl border border-primary-100 dark:border-primary-800">
-                                    <div>
-                                        <p className="text-xs text-gray-500 dark:text-gray-400 font-medium">Student Name</p>
-                                        <p className="font-bold text-gray-900 dark:text-gray-100">{formData.studentName}</p>
-                                    </div>
-                                    <div>
-                                        <p className="text-xs text-gray-500 dark:text-gray-400 font-medium">Roll Number</p>
-                                        <p className="font-bold text-gray-900 dark:text-gray-100">{formData.rollNo}</p>
-                                    </div>
-                                    <div>
-                                        <p className="text-xs text-gray-500 dark:text-gray-400 font-medium">Course</p>
-                                        <p className="font-bold text-gray-900 dark:text-gray-100">{formData.course}</p>
-                                    </div>
-                                    <div>
-                                        <p className="text-xs text-gray-500 dark:text-gray-400 font-medium">Semester</p>
-                                        <p className="font-bold text-gray-900 dark:text-gray-100">{formData.semester}</p>
-                                    </div>
+                            {/* Manual Entry Form (or Read-only Display for Database Mode) */}
+                            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Student Name *</label>
+                                    <input
+                                        type="text"
+                                        name="studentName"
+                                        value={formData.studentName}
+                                        onChange={handleInputChange}
+                                        readOnly={entryMode === 'database' && !result}
+                                        className={`w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-primary-500 outline-none ${entryMode === 'database' && !result ? 'bg-gray-100 dark:bg-gray-900 cursor-not-allowed' : ''}`}
+                                        placeholder="e.g. John Doe"
+                                        required
+                                    />
                                 </div>
-                            )}
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Roll Number *</label>
+                                    <input
+                                        type="text"
+                                        name="rollNo"
+                                        value={formData.rollNo}
+                                        onChange={handleInputChange}
+                                        readOnly={entryMode === 'database' && !result}
+                                        className={`w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-primary-500 outline-none ${entryMode === 'database' && !result ? 'bg-gray-100 dark:bg-gray-900 cursor-not-allowed' : ''}`}
+                                        placeholder="e.g. PGC-2024-001"
+                                        required
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Course / Class *</label>
+                                    <input
+                                        type="text"
+                                        name="course"
+                                        value={formData.course}
+                                        onChange={handleInputChange}
+                                        readOnly={entryMode === 'database' && !result}
+                                        className={`w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-primary-500 outline-none ${entryMode === 'database' && !result ? 'bg-gray-100 dark:bg-gray-900 cursor-not-allowed' : ''}`}
+                                        placeholder="e.g. ICS"
+                                        required
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Semester / Session *</label>
+                                    <input
+                                        type="text"
+                                        name="semester"
+                                        value={formData.semester}
+                                        onChange={handleInputChange}
+                                        readOnly={entryMode === 'database' && !result}
+                                        className={`w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-primary-500 outline-none ${entryMode === 'database' && !result ? 'bg-gray-100 dark:bg-gray-900 cursor-not-allowed' : ''}`}
+                                        placeholder="e.g. 1st Semester"
+                                        required
+                                    />
+                                </div>
+                            </div>
 
                             {/* Marks Entry */}
                             <div className="space-y-3">
@@ -388,21 +530,33 @@ const ResultForm = ({ result, onClose }) => {
                         </div>
 
                         {/* Actions - Fixed Footer */}
-                        <div className="flex gap-2 sm:gap-3 p-4 sm:p-6 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-750 flex-shrink-0">
-                            <button
-                                type="button"
-                                onClick={onClose}
-                                className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 font-semibold hover:bg-gray-50 dark:hover:bg-gray-700 text-sm"
-                            >
-                                Cancel
-                            </button>
-                            <button
-                                type="submit"
-                                disabled={!formData.studentName}
-                                className="flex-1 px-4 py-2 bg-primary-600 text-white rounded-lg font-semibold hover:bg-primary-700 disabled:opacity-50 text-sm"
-                            >
-                                {result ? 'Update Result' : 'Add Result'}
-                            </button>
+                        <div className="flex flex-col-reverse sm:flex-row sm:items-center justify-between gap-4 p-4 sm:p-6 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-750 flex-shrink-0">
+                            <label className="flex items-center gap-2 cursor-pointer select-none">
+                                <input
+                                    type="checkbox"
+                                    checked={formData.isPublished}
+                                    onChange={(e) => setFormData({ ...formData, isPublished: e.target.checked })}
+                                    className="w-4 h-4 text-primary-600 rounded border-gray-300 focus:ring-primary-500"
+                                />
+                                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Publish Result</span>
+                            </label>
+
+                            <div className="flex items-center gap-3 w-full sm:w-auto">
+                                <button
+                                    type="button"
+                                    onClick={onClose}
+                                    className="flex-1 sm:flex-none px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 font-medium hover:bg-white dark:hover:bg-gray-700 transition-colors text-sm text-center"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    type="submit"
+                                    disabled={!formData.studentName}
+                                    className="flex-1 sm:flex-none px-6 py-2 bg-primary-600 text-white rounded-lg font-semibold hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm shadow-sm text-center"
+                                >
+                                    {result ? 'Update Result' : 'Add Result'}
+                                </button>
+                            </div>
                         </div>
                     </form>
                 </div>
